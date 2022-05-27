@@ -6,6 +6,8 @@ class CustomTheme {
       fontFamily: 'Poppins',
       brightness: Brightness.dark,
       colorScheme: const ColorScheme.dark(primary: Colors.deepPurple),
+      backgroundColor: Colors.grey[900],
+      scaffoldBackgroundColor: Colors.grey[900],
     );
   }
 }
