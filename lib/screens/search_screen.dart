@@ -1,7 +1,7 @@
 import 'package:A.N.R/constants/providers.dart';
+import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/models/search_result.dart';
 import 'package:A.N.R/routes.dart';
-import 'package:A.N.R/screens/book_screen.dart';
 import 'package:A.N.R/services/leitor/leitor_search.dart';
 import 'package:A.N.R/styles/colors.dart';
 import 'package:A.N.R/widgets/book_element.dart';
@@ -115,7 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         onTap: () {
                           Navigator.of(context).pushNamed(
                             RoutesName.BOOK,
-                            arguments: BookArguments(
+                            arguments: BookItem(
                               id: data.id,
                               url: data.url,
                               name: data.name,

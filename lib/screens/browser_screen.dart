@@ -1,6 +1,6 @@
 import 'package:A.N.R/constants/providers.dart';
+import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/routes.dart';
-import 'package:A.N.R/screens/book_screen.dart';
 import 'package:A.N.R/screens/search_screen.dart';
 import 'package:A.N.R/services/leitor/leitor_highlights.dart';
 import 'package:A.N.R/services/leitor/leitor_most_read.dart';
@@ -123,7 +123,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                             child: InkWell(onTap: () {
                               Navigator.of(context).pushNamed(
                                 RoutesName.BOOK,
-                                arguments: BookArguments(
+                                arguments: BookItem(
                                   id: e.id,
                                   url: e.url,
                                   name: e.name,
@@ -155,7 +155,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                     onTap: () {
                       Navigator.of(context).pushNamed(
                         RoutesName.BOOK,
-                        arguments: BookArguments(
+                        arguments: BookItem(
                           id: data.id,
                           url: data.url,
                           name: data.name,
@@ -180,7 +180,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                     onTap: () {
                       Navigator.of(context).pushNamed(
                         RoutesName.BOOK,
-                        arguments: BookArguments(
+                        arguments: BookItem(
                           id: data.id,
                           url: data.url,
                           name: data.name,
@@ -205,7 +205,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                     onTap: () {
                       Navigator.of(context).pushNamed(
                         RoutesName.BOOK,
-                        arguments: BookArguments(
+                        arguments: BookItem(
                           id: data.id,
                           url: data.url,
                           name: data.name,
