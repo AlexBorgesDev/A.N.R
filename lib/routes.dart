@@ -2,12 +2,15 @@
 
 import 'package:A.N.R/screens/browser_screen.dart';
 import 'package:A.N.R/screens/login_screen.dart';
+import 'package:A.N.R/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 
 class RoutesName {
   static const LOGIN = '/login';
   static const BROWSER = '/browser';
   static const READER = '/reader';
+
+  static const SEARCH = '/search';
 }
 
 class Routes {
@@ -15,6 +18,7 @@ class Routes {
     return {
       RoutesName.LOGIN: (_) => const LoginScreen(),
       RoutesName.BROWSER: (_) => const BrowserScreen(),
+      RoutesName.SEARCH: (_) => const SearchScreen(),
     };
   }
 }
