@@ -1,3 +1,4 @@
+import 'package:A.N.R/constants/providers.dart';
 import 'package:flutter/material.dart';
 
 class BookScreen extends StatefulWidget {
@@ -20,10 +21,12 @@ class BookArguments {
   final String name;
   final String imageURL;
   final String? imageURL2;
+  final Providers provider;
 
   const BookArguments({
     required this.url,
     required this.name,
+    required this.provider,
     required this.imageURL,
     this.imageURL2,
     this.id,
