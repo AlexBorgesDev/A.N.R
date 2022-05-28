@@ -14,7 +14,7 @@ Future<List<BookLeitorHighlights>> leitorHighlights() async {
   dio.interceptors.add(cacheManager.interceptor);
 
   try {
-    Response response = await dio.get(url, options: cacheOptions);
+    final Response response = await dio.get(url, options: cacheOptions);
 
     final List<dynamic> items = response.data['featured'];
     final List<BookLeitorHighlights> itemsData = items.map((item) {
