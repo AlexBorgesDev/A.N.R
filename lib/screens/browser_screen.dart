@@ -1,3 +1,6 @@
+import 'package:A.N.R/constants/providers.dart';
+import 'package:A.N.R/routes.dart';
+import 'package:A.N.R/screens/search_screen.dart';
 import 'package:A.N.R/services/leitor/leitor_highlights.dart';
 import 'package:A.N.R/services/leitor/leitor_most_read.dart';
 import 'package:A.N.R/services/leitor/leitor_most_read_week.dart';
@@ -53,11 +56,19 @@ class _BrowserScreenState extends State<BrowserScreen> {
       appBar: AppBar(
         title: const Text('A.N.R'),
         actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                RoutesName.SEARCH,
+                arguments: const SearchArguments(Providers.leitor),
+              );
+            },
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             itemBuilder: (context) => <PopupMenuEntry>[
-              const PopupMenuItem(child: Text('Neox')),
+              const PopupMenuItem(enabled: false, child: Text('Neox')),
               const PopupMenuItem(enabled: false, child: Text('Downloads')),
               const PopupMenuItem(child: Text('Sair')),
             ],
