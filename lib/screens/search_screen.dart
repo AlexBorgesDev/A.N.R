@@ -1,5 +1,7 @@
 import 'package:A.N.R/constants/providers.dart';
 import 'package:A.N.R/models/search_result.dart';
+import 'package:A.N.R/routes.dart';
+import 'package:A.N.R/screens/book_screen.dart';
 import 'package:A.N.R/services/leitor/leitor_search.dart';
 import 'package:A.N.R/styles/colors.dart';
 import 'package:A.N.R/widgets/book_element.dart';
@@ -110,7 +112,19 @@ class _SearchScreenState extends State<SearchScreen> {
                       return BookElement(
                         imageURL: data.imageURL2 ?? data.imageURL,
                         imageURL2: data.imageURL2,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            RoutesName.BOOK,
+                            arguments: BookArguments(
+                              id: data.id,
+                              url: data.url,
+                              name: data.name,
+                              provider: args.provider,
+                              imageURL: data.imageURL,
+                              imageURL2: data.imageURL2,
+                            ),
+                          );
+                        },
                       );
                     },
                     childCount: _results.length,

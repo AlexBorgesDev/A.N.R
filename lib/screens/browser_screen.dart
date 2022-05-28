@@ -1,5 +1,6 @@
 import 'package:A.N.R/constants/providers.dart';
 import 'package:A.N.R/routes.dart';
+import 'package:A.N.R/screens/book_screen.dart';
 import 'package:A.N.R/screens/search_screen.dart';
 import 'package:A.N.R/services/leitor/leitor_highlights.dart';
 import 'package:A.N.R/services/leitor/leitor_most_read.dart';
@@ -115,7 +116,23 @@ class _BrowserScreenState extends State<BrowserScreen> {
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ),
-                        )
+                        ),
+                        Positioned.fill(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(onTap: () {
+                              Navigator.of(context).pushNamed(
+                                RoutesName.BOOK,
+                                arguments: BookArguments(
+                                  id: e.id,
+                                  url: e.url,
+                                  name: e.name,
+                                  provider: Providers.leitor,
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -135,7 +152,19 @@ class _BrowserScreenState extends State<BrowserScreen> {
                   return BookElementProps(
                     imageURL2: data.imageURL,
                     imageURL: data.imageURL2,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        RoutesName.BOOK,
+                        arguments: BookArguments(
+                          id: data.id,
+                          url: data.url,
+                          name: data.name,
+                          provider: Providers.leitor,
+                          imageURL: data.imageURL,
+                          imageURL2: data.imageURL2,
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -148,7 +177,19 @@ class _BrowserScreenState extends State<BrowserScreen> {
                   return BookElementProps(
                     imageURL2: data.imageURL,
                     imageURL: data.imageURL2,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        RoutesName.BOOK,
+                        arguments: BookArguments(
+                          id: data.id,
+                          url: data.url,
+                          name: data.name,
+                          provider: Providers.leitor,
+                          imageURL: data.imageURL,
+                          imageURL2: data.imageURL2,
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -161,7 +202,19 @@ class _BrowserScreenState extends State<BrowserScreen> {
                   return BookElementProps(
                     imageURL2: data.imageURL,
                     imageURL: data.imageURL2,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        RoutesName.BOOK,
+                        arguments: BookArguments(
+                          id: data.id,
+                          url: data.url,
+                          name: data.name,
+                          provider: Providers.leitor,
+                          imageURL: data.imageURL,
+                          imageURL2: data.imageURL2,
+                        ),
+                      );
+                    },
                   );
                 },
               ),
