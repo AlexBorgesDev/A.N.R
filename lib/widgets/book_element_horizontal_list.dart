@@ -48,6 +48,7 @@ class BookElementHorizontalList extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   tag: data.tag,
                   imageURL: data.imageURL,
+                  imageURL2: data.imageURL2,
                   onLongPress: data.onLongPress,
                   onTap: data.onTap,
                 );
@@ -60,6 +61,7 @@ class BookElementHorizontalList extends StatelessWidget {
 class BookElementProps {
   final String? tag;
   final String imageURL;
+  final String? imageURL2;
   final Function() onTap;
   final Function()? onLongPress;
 
@@ -67,6 +69,7 @@ class BookElementProps {
     required this.imageURL,
     required this.onTap,
     this.onLongPress,
+    this.imageURL2,
     this.tag,
   });
 }

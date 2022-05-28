@@ -6,6 +6,7 @@ import 'package:shimmer/shimmer.dart';
 class BookElement extends StatelessWidget {
   final String? tag;
   final String imageURL;
+  final String? imageURL2;
   final EdgeInsetsGeometry? margin;
   final Function() onTap;
   final Function()? onLongPress;
@@ -14,6 +15,7 @@ class BookElement extends StatelessWidget {
     required this.imageURL,
     required this.onTap,
     this.onLongPress,
+    this.imageURL2,
     this.margin,
     this.tag,
     Key? key,
@@ -36,6 +38,14 @@ class BookElement extends StatelessWidget {
                 child: CachedNetworkImage(
                   fit: BoxFit.cover,
                   imageUrl: imageURL,
+                  errorWidget: imageURL2 != null
+                      ? (context, url, error) {
+                          return CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl: imageURL2!,
+                          );
+                        }
+                      : null,
                 ),
               ),
               Positioned(
