@@ -8,6 +8,7 @@ class CustomTheme {
       brightness: Brightness.dark,
       appBarTheme: const AppBarTheme(backgroundColor: CustomColors.surface),
       primaryColor: CustomColors.primary,
+      primarySwatch: CustomColors.primary,
       backgroundColor: CustomColors.background,
       scaffoldBackgroundColor: CustomColors.background,
       popupMenuTheme: const PopupMenuThemeData(color: CustomColors.surfaceTwo),
