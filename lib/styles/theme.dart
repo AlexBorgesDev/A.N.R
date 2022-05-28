@@ -10,6 +10,7 @@ class CustomTheme {
       primaryColor: CustomColors.primary,
       backgroundColor: CustomColors.background,
       scaffoldBackgroundColor: CustomColors.background,
+      popupMenuTheme: const PopupMenuThemeData(color: CustomColors.surfaceTwo),
     );
   }
 }
