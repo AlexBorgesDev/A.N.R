@@ -8,7 +8,10 @@ Future<List<BookLeitorHighlights>> leitorHighlights() async {
     CacheConfig(baseUrl: url),
   );
 
-  final Options cacheOptions = buildCacheOptions(const Duration(days: 7));
+  final Options cacheOptions = buildCacheOptions(
+    const Duration(days: 7),
+    forceRefresh: true,
+  );
 
   final Dio dio = Dio();
   dio.interceptors.add(cacheManager.interceptor);
