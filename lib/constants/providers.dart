@@ -4,10 +4,10 @@ extension ProvidersExtension on Providers {
   String get value {
     switch (this) {
       case Providers.leitor:
-        return 'leitor';
+        return 'Leitor';
 
       case Providers.neox:
-        return 'neox';
+        return 'Neox';
     }
   }
 }
