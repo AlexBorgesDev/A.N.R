@@ -8,9 +8,11 @@ import 'package:flutter/material.dart';
 class RoutesName {
   static const LOGIN = '/login';
   static const BROWSER = '/browser';
-  static const READER = '/reader';
 
+  static const BOOK = '/book';
+  static const READER = '/reader';
   static const SEARCH = '/search';
+  static const FAVORITEs = '/favorites';
 }
 
 class Routes {
