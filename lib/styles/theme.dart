@@ -1,3 +1,4 @@
+import 'package:A.N.R/styles/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomTheme {
@@ -5,9 +6,10 @@ class CustomTheme {
     return ThemeData(
       fontFamily: 'Poppins',
       brightness: Brightness.dark,
-      colorScheme: const ColorScheme.dark(primary: Colors.deepPurple),
-      backgroundColor: Colors.grey[900],
-      scaffoldBackgroundColor: Colors.grey[900],
+      appBarTheme: const AppBarTheme(backgroundColor: CustomColors.surface),
+      primaryColor: CustomColors.primary,
+      backgroundColor: CustomColors.background,
+      scaffoldBackgroundColor: CustomColors.background,
     );
   }
 }
