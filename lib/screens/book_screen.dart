@@ -16,7 +16,7 @@ class _BookScreenState extends State<BookScreen> {
 }
 
 class BookArguments {
-  final String? id;
+  final int? id;
   final String url;
   final String name;
   final String imageURL;
