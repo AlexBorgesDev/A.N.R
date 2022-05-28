@@ -1,5 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
+import 'package:A.N.R/screens/book_screen.dart';
 import 'package:A.N.R/screens/browser_screen.dart';
 import 'package:A.N.R/screens/login_screen.dart';
 import 'package:A.N.R/screens/search_screen.dart';
@@ -21,6 +22,7 @@ class Routes {
       RoutesName.LOGIN: (_) => const LoginScreen(),
       RoutesName.BROWSER: (_) => const BrowserScreen(),
       RoutesName.SEARCH: (_) => const SearchScreen(),
+      RoutesName.BOOK: (_) => const BookScreen(),
     };
   }
 }
