@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomColors {
   static const MaterialColor primary = Colors.indigo;
+  static const Color accent = Color.fromRGBO(68, 157, 171, 1);
 
   static const Color option = Color.fromRGBO(59, 62, 82, 1);
   static const Color greyDark = Color.fromRGBO(58, 61, 65, 1);
