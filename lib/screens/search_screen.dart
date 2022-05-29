@@ -116,7 +116,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           Navigator.of(context).pushNamed(
                             RoutesName.BOOK,
                             arguments: BookItem(
-                              id: data.id,
+                              id: data.id ?? 0,
                               url: data.url,
                               name: data.name,
                               provider: args.provider,
