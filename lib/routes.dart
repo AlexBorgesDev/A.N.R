@@ -2,6 +2,7 @@
 
 import 'package:A.N.R/screens/book_screen.dart';
 import 'package:A.N.R/screens/browser_screen.dart';
+import 'package:A.N.R/screens/favorites_screen.dart';
 import 'package:A.N.R/screens/login_screen.dart';
 import 'package:A.N.R/screens/search_screen.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class RoutesName {
   static const BOOK = '/book';
   static const READER = '/reader';
   static const SEARCH = '/search';
-  static const FAVORITEs = '/favorites';
+  static const FAVORITES = '/favorites';
 }
 
 class Routes {
@@ -23,6 +24,7 @@ class Routes {
       RoutesName.BROWSER: (_) => const BrowserScreen(),
       RoutesName.SEARCH: (_) => const SearchScreen(),
       RoutesName.BOOK: (_) => const BookScreen(),
+      RoutesName.FAVORITES: (_) => const FavoritesScreen(),
     };
   }
 }

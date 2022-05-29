@@ -46,6 +46,12 @@ class _BrowserScreenState extends State<BrowserScreen> {
     });
   }
 
+  void _onSelected(dynamic value) {
+    if (value == RoutesName.FAVORITES) {
+      Navigator.of(context).pushNamed(RoutesName.FAVORITES);
+    }
+  }
+
   @override
   void initState() {
     _handleGetData();
@@ -76,10 +82,15 @@ class _BrowserScreenState extends State<BrowserScreen> {
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             itemBuilder: (context) => <PopupMenuEntry>[
+              const PopupMenuItem(
+                value: RoutesName.FAVORITES,
+                child: Text('Favoritos'),
+              ),
               const PopupMenuItem(enabled: false, child: Text('Neox')),
               const PopupMenuItem(enabled: false, child: Text('Downloads')),
               const PopupMenuItem(child: Text('Sair')),
             ],
+            onSelected: _onSelected,
           ),
         ],
       ),
