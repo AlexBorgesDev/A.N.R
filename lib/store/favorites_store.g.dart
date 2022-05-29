@@ -1,0 +1,78 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'favorites_store.dart';
+
+// **************************************************************************
+// StoreGenerator
+// **************************************************************************
+
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+
+mixin _$FavoritesStore on FavoritesStoreBase, Store {
+  Computed<List<BookFavorite>>? _$itemsComputed;
+
+  @override
+  List<BookFavorite> get items =>
+      (_$itemsComputed ??= Computed<List<BookFavorite>>(() => super.items,
+              name: 'FavoritesStoreBase.items'))
+          .value;
+
+  final _$favoritesAtom = Atom(name: 'FavoritesStoreBase.favorites');
+
+  @override
+  ObservableMap<String, BookFavorite> get favorites {
+    _$favoritesAtom.reportRead();
+    return super.favorites;
+  }
+
+  @override
+  set favorites(ObservableMap<String, BookFavorite> value) {
+    _$favoritesAtom.reportWrite(value, super.favorites, () {
+      super.favorites = value;
+    });
+  }
+
+  final _$FavoritesStoreBaseActionController =
+      ActionController(name: 'FavoritesStoreBase');
+
+  @override
+  void set(Map<String, BookFavorite> data) {
+    final _$actionInfo = _$FavoritesStoreBaseActionController.startAction(
+        name: 'FavoritesStoreBase.set');
+    try {
+      return super.set(data);
+    } finally {
+      _$FavoritesStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void add(BookFavorite book) {
+    final _$actionInfo = _$FavoritesStoreBaseActionController.startAction(
+        name: 'FavoritesStoreBase.add');
+    try {
+      return super.add(book);
+    } finally {
+      _$FavoritesStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void remove(String id) {
+    final _$actionInfo = _$FavoritesStoreBaseActionController.startAction(
+        name: 'FavoritesStoreBase.remove');
+    try {
+      return super.remove(id);
+    } finally {
+      _$FavoritesStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  String toString() {
+    return '''
+favorites: ${favorites},
+items: ${items}
+    ''';
+  }
+}
