@@ -17,7 +17,7 @@ abstract class FavoritesStoreBase with Store {
 
   @action
   void add(BookFavorite book) {
-    favorites.update(book.id.toString(), (_) => book, ifAbsent: () => book);
+    favorites.update(book.id, (_) => book, ifAbsent: () => book);
   }
 
   @action
