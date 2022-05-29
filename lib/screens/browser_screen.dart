@@ -2,6 +2,7 @@ import 'package:A.N.R/constants/providers.dart';
 import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/screens/search_screen.dart';
+import 'package:A.N.R/services/favorites.dart';
 import 'package:A.N.R/services/leitor/leitor_highlights.dart';
 import 'package:A.N.R/services/leitor/leitor_most_read.dart';
 import 'package:A.N.R/services/leitor/leitor_most_read_week.dart';
@@ -49,6 +50,12 @@ class _BrowserScreenState extends State<BrowserScreen> {
   void initState() {
     _handleGetData();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    Favorites.getAll(context);
+    super.didChangeDependencies();
   }
 
   @override

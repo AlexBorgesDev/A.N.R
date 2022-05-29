@@ -1,14 +1,17 @@
 import 'package:A.N.R/models/book.dart';
 import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/models/chapter.dart';
+import 'package:A.N.R/services/favorites.dart';
 import 'package:A.N.R/services/leitor/leitor_get_book.dart';
 import 'package:A.N.R/services/leitor/leitor_get_chapters.dart';
+import 'package:A.N.R/store/favorites_store.dart';
 import 'package:A.N.R/styles/colors.dart';
 import 'package:A.N.R/widgets/accent_subtitle.dart';
 import 'package:A.N.R/widgets/sinopse.dart';
 import 'package:A.N.R/widgets/to_info_button.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BookScreen extends StatefulWidget {
   const BookScreen({Key? key}) : super(key: key);
@@ -21,6 +24,7 @@ class _BookScreenState extends State<BookScreen> {
   final ScrollController _scroll = ScrollController();
 
   late BookItem _bookItem;
+  late Favorites _favorite;
 
   Book? _book;
 
@@ -53,7 +57,7 @@ class _BookScreenState extends State<BookScreen> {
     }
   }
 
-  Future<void> _handleGetBook() async {
+  Future<void> _handleGetBook(Function(BookItem) call) async {
     try {
       final Book book = await leitorGetBook(_bookItem.url);
 
@@ -65,6 +69,8 @@ class _BookScreenState extends State<BookScreen> {
           provider: _bookItem.provider,
           imageURL: book.imageURL,
         );
+
+        call(_bookItem);
       }
 
       setState(() {
@@ -106,8 +112,15 @@ class _BookScreenState extends State<BookScreen> {
 
   @override
   void didChangeDependencies() {
+    final FavoritesStore store = Provider.of<FavoritesStore>(context);
+
     _bookItem = ModalRoute.of(context)!.settings.arguments as BookItem;
-    _handleGetBook();
+    _favorite = Favorites(book: _bookItem, store: store, context: context);
+
+    _handleGetBook((book) {
+      _favorite = Favorites(book: book, store: store, context: context);
+    });
+
     _handleGetChapters();
     _scroll.addListener(_fetchChapterListener);
 
@@ -142,12 +155,7 @@ class _BookScreenState extends State<BookScreen> {
             centerTitle: false,
             expandedHeight: (74 * MediaQuery.of(context).size.height) / 100,
             backgroundColor: CustomColors.background,
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.favorite_outline),
-              ),
-            ],
+            actions: [_favorite.button],
             flexibleSpace: FlexibleSpaceBar(
               collapseMode: CollapseMode.pin,
               background: Stack(
