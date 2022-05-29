@@ -1,7 +1,7 @@
 import 'package:A.N.R/constants/providers.dart';
 
 class BookItem {
-  final int id;
+  final String id;
   final String url;
   final String name;
   final String? imageURL;

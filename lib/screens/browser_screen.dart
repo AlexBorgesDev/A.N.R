@@ -124,7 +124,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                               Navigator.of(context).pushNamed(
                                 RoutesName.BOOK,
                                 arguments: BookItem(
-                                  id: e.id,
+                                  id: e.id.toString(),
                                   url: e.url,
                                   name: e.name,
                                   provider: Providers.leitor,
@@ -156,7 +156,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                       Navigator.of(context).pushNamed(
                         RoutesName.BOOK,
                         arguments: BookItem(
-                          id: data.id,
+                          id: data.id.toString(),
                           url: data.url,
                           name: data.name,
                           provider: Providers.leitor,
@@ -181,7 +181,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                       Navigator.of(context).pushNamed(
                         RoutesName.BOOK,
                         arguments: BookItem(
-                          id: data.id,
+                          id: data.id.toString(),
                           url: data.url,
                           name: data.name,
                           provider: Providers.leitor,
@@ -206,7 +206,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                       Navigator.of(context).pushNamed(
                         RoutesName.BOOK,
                         arguments: BookItem(
-                          id: data.id,
+                          id: data.id.toString(),
                           url: data.url,
                           name: data.name,
                           provider: Providers.leitor,

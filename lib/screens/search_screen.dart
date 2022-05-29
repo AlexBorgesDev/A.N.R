@@ -4,6 +4,7 @@ import 'package:A.N.R/models/search_result.dart';
 import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/services/leitor/leitor_search.dart';
 import 'package:A.N.R/styles/colors.dart';
+import 'package:A.N.R/utils/url_to_id.dart';
 import 'package:A.N.R/widgets/book_element.dart';
 import 'package:A.N.R/widgets/book_element_sliver_grid.dart';
 import 'package:flutter/material.dart';
@@ -113,10 +114,14 @@ class _SearchScreenState extends State<SearchScreen> {
                         imageURL: data.imageURL2 ?? data.imageURL,
                         imageURL2: data.imageURL2,
                         onTap: () {
+                          final String id = data.id != null
+                              ? urlToId(data.id.toString())
+                              : data.url;
+
                           Navigator.of(context).pushNamed(
                             RoutesName.BOOK,
                             arguments: BookItem(
-                              id: data.id ?? 0,
+                              id: id,
                               url: data.url,
                               name: data.name,
                               provider: args.provider,

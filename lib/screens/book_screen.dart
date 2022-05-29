@@ -85,7 +85,7 @@ class _BookScreenState extends State<BookScreen> {
 
     try {
       final List<Chapter> chapters = await leitorGetChapters(
-        id: _bookItem.id,
+        id: int.parse(_bookItem.id),
         page: _page,
       );
 
