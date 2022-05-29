@@ -1,4 +1,5 @@
 class Chapter {
+  final int idRelease;
   final String number;
   final String url;
   final String? idSerie;
@@ -6,6 +7,7 @@ class Chapter {
   final String? id;
 
   const Chapter({
+    required this.idRelease,
     required this.number,
     required this.url,
     this.idSerie,

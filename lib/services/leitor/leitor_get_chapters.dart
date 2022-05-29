@@ -25,10 +25,12 @@ Future<List<Chapter>> leitorGetChapters({required int id, int? page}) async {
   final List<Chapter> chapters = items.map((e) {
     final Map releases = e['releases'];
     final String link = releases[releases.keys.first]['link'];
+    final int idRelease = releases[releases.keys.first]['id_release'];
 
     return Chapter(
       id: e['id_chapter'].toString(),
       idSerie: e['id_serie'].toString(),
+      idRelease: idRelease,
       number: e['number'].toString(),
       name: e['chapter_name'],
       url: link,
