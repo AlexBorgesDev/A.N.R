@@ -9,24 +9,24 @@ part of 'favorites_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$FavoritesStore on FavoritesStoreBase, Store {
-  Computed<List<BookFavorite>>? _$itemsComputed;
+  Computed<List<BookItem>>? _$itemsComputed;
 
   @override
-  List<BookFavorite> get items =>
-      (_$itemsComputed ??= Computed<List<BookFavorite>>(() => super.items,
+  List<BookItem> get items =>
+      (_$itemsComputed ??= Computed<List<BookItem>>(() => super.items,
               name: 'FavoritesStoreBase.items'))
           .value;
 
   final _$favoritesAtom = Atom(name: 'FavoritesStoreBase.favorites');
 
   @override
-  ObservableMap<String, BookFavorite> get favorites {
+  ObservableMap<String, BookItem> get favorites {
     _$favoritesAtom.reportRead();
     return super.favorites;
   }
 
   @override
-  set favorites(ObservableMap<String, BookFavorite> value) {
+  set favorites(ObservableMap<String, BookItem> value) {
     _$favoritesAtom.reportWrite(value, super.favorites, () {
       super.favorites = value;
     });
@@ -36,7 +36,7 @@ mixin _$FavoritesStore on FavoritesStoreBase, Store {
       ActionController(name: 'FavoritesStoreBase');
 
   @override
-  void set(Map<String, BookFavorite> data) {
+  void set(Map<String, BookItem> data) {
     final _$actionInfo = _$FavoritesStoreBaseActionController.startAction(
         name: 'FavoritesStoreBase.set');
     try {
@@ -47,7 +47,7 @@ mixin _$FavoritesStore on FavoritesStoreBase, Store {
   }
 
   @override
-  void add(BookFavorite book) {
+  void add(BookItem book) {
     final _$actionInfo = _$FavoritesStoreBaseActionController.startAction(
         name: 'FavoritesStoreBase.add');
     try {

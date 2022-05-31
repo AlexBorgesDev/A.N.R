@@ -8,7 +8,7 @@ class BookElementHorizontalList extends StatelessWidget {
   final bool isLoading;
 
   final int itemCount;
-  final BookElementProps Function(int) itemData;
+  final BookElementData Function(int) itemData;
 
   final int loadingItemCount;
 
@@ -43,10 +43,12 @@ class BookElementHorizontalList extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemCount: itemCount,
               itemBuilder: (_, index) {
-                final BookElementProps data = itemData(index);
+                final BookElementData data = itemData(index);
                 return BookElement(
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   tag: data.tag,
+                  is18: data.is18,
+                  headers: data.headers,
                   imageURL: data.imageURL,
                   imageURL2: data.imageURL2,
                   onLongPress: data.onLongPress,
@@ -58,18 +60,22 @@ class BookElementHorizontalList extends StatelessWidget {
   }
 }
 
-class BookElementProps {
+class BookElementData {
+  final bool? is18;
   final String? tag;
   final String imageURL;
   final String? imageURL2;
   final Function() onTap;
   final Function()? onLongPress;
+  final Map<String, String>? headers;
 
-  const BookElementProps({
+  const BookElementData({
     required this.imageURL,
     required this.onTap,
     this.onLongPress,
     this.imageURL2,
+    this.headers,
+    this.is18,
     this.tag,
   });
 }

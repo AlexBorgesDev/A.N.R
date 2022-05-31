@@ -1,4 +1,4 @@
-import 'package:A.N.R/models/book_favorite.dart';
+import 'package:A.N.R/models/book_item.dart';
 import 'package:mobx/mobx.dart';
 
 part 'favorites_store.g.dart';
@@ -7,16 +7,16 @@ class FavoritesStore = FavoritesStoreBase with _$FavoritesStore;
 
 abstract class FavoritesStoreBase with Store {
   @observable
-  ObservableMap<String, BookFavorite> favorites = ObservableMap();
+  ObservableMap<String, BookItem> favorites = ObservableMap();
 
   @computed
-  List<BookFavorite> get items => favorites.values.toList();
+  List<BookItem> get items => favorites.values.toList();
 
   @action
-  void set(Map<String, BookFavorite> data) => favorites.addAll(data);
+  void set(Map<String, BookItem> data) => favorites.addAll(data);
 
   @action
-  void add(BookFavorite book) {
+  void add(BookItem book) {
     favorites.update(book.id, (_) => book, ifAbsent: () => book);
   }
 

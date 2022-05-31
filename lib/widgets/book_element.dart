@@ -1,13 +1,17 @@
+import 'dart:ui';
+
 import 'package:A.N.R/styles/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class BookElement extends StatelessWidget {
+  final bool? is18;
   final String? tag;
   final String imageURL;
   final String? imageURL2;
   final EdgeInsetsGeometry? margin;
+  final Map<String, String>? headers;
   final Function() onTap;
   final Function()? onLongPress;
 
@@ -16,7 +20,9 @@ class BookElement extends StatelessWidget {
     required this.onTap,
     this.onLongPress,
     this.imageURL2,
+    this.headers,
     this.margin,
+    this.is18,
     this.tag,
     Key? key,
   }) : super(key: key);
@@ -38,11 +44,13 @@ class BookElement extends StatelessWidget {
                 child: CachedNetworkImage(
                   fit: BoxFit.cover,
                   imageUrl: imageURL,
+                  httpHeaders: headers,
                   errorWidget: imageURL2 != null
                       ? (context, url, error) {
                           return CachedNetworkImage(
                             fit: BoxFit.cover,
                             imageUrl: imageURL2!,
+                            httpHeaders: headers,
                           );
                         }
                       : null,
@@ -76,6 +84,15 @@ class BookElement extends StatelessWidget {
                         ),
                       )
                     : const SizedBox(),
+              ),
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: is18 == true ? 4 : 0,
+                    sigmaY: is18 == true ? 4 : 0,
+                  ),
+                  child: Container(),
+                ),
               ),
               Positioned.fill(
                 child: Material(
