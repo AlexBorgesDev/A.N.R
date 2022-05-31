@@ -1,6 +1,7 @@
 import 'package:A.N.R/models/book.dart';
 import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/models/chapter.dart';
+import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/services/favorites.dart';
 import 'package:A.N.R/services/leitor/leitor_get_book.dart';
 import 'package:A.N.R/services/leitor/leitor_get_chapters.dart';
@@ -274,7 +275,12 @@ class _BookScreenState extends State<BookScreen> {
               return ListTile(
                 title: Text('Capítulo ${chapter.number}'),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 32),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushNamed(
+                    RoutesName.READER,
+                    arguments: chapter,
+                  );
+                },
               );
             }, childCount: _chapters.length),
           ),
