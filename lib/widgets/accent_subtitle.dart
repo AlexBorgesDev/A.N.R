@@ -1,7 +1,9 @@
 import 'package:A.N.R/styles/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 class AccentSubtitleWithDots extends StatelessWidget {
+  final bool isLoading;
   final List<String> data;
   final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry? padding;
@@ -10,6 +12,7 @@ class AccentSubtitleWithDots extends StatelessWidget {
     this.data, {
     this.margin,
     this.padding,
+    this.isLoading = false,
     Key? key,
   }) : super(key: key);
 
@@ -35,7 +38,7 @@ class AccentSubtitleWithDots extends StatelessWidget {
       padding: padding,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: _handleData(),
+        children: isLoading ? const [AccentSubtitleShimmer()] : _handleData(),
       ),
     );
   }
@@ -71,6 +74,28 @@ class AccentSubtitleDot extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color.fromRGBO(40, 40, 40, 1),
         borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+}
+
+class AccentSubtitleShimmer extends StatelessWidget {
+  final double? width;
+
+  const AccentSubtitleShimmer({this.width, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: CustomColors.surface,
+      highlightColor: CustomColors.surfaceTwo,
+      child: Container(
+        width: width ?? 280,
+        height: 22,
+        decoration: BoxDecoration(
+          color: CustomColors.surface,
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }

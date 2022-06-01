@@ -1,5 +1,7 @@
 import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/routes.dart';
+import 'package:A.N.R/services/favorites.dart';
+import 'package:A.N.R/services/historic.dart';
 import 'package:A.N.R/services/scans/manga_host_services.dart';
 import 'package:A.N.R/services/scans/mark_services.dart';
 import 'package:A.N.R/services/scans/neox_services.dart';
@@ -50,6 +52,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    Favorites.getAll(context);
+    Historic.getAll(context);
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -61,6 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             icon: const Icon(Icons.search),
           ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(RoutesName.FAVORITES);
+            },
+            icon: const Icon(Icons.favorite),
+          )
         ],
       ),
       body: RefreshIndicator(

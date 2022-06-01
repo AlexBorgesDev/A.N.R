@@ -1,6 +1,7 @@
 import 'package:A.N.R/firebase_options.dart';
 import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/store/favorites_store.dart';
+import 'package:A.N.R/store/historic_store.dart';
 import 'package:A.N.R/styles/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,7 +28,10 @@ class MyApp extends StatelessWidget {
     final bool isAuthenticated = FirebaseAuth.instance.currentUser != null;
 
     return MultiProvider(
-      providers: [Provider(create: (_) => FavoritesStore())],
+      providers: [
+        Provider(create: (_) => FavoritesStore()),
+        Provider(create: (_) => HistoricStore()),
+      ],
       child: MaterialApp(
         title: 'A.N.R',
         themeMode: ThemeMode.dark,
