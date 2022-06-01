@@ -70,6 +70,49 @@ class MangaHostServices {
     }
   }
 
+  static Future<List<BookItem>> search(String value) async {
+    final List<BookItem> items = [];
+
+    final String subKey = 'find/$value';
+    final String url = '$baseURL/$subKey';
+
+    final Dio dio = Dio();
+    final Options options = _cacheOptions(subKey: subKey);
+    dio.interceptors.add(_cacheManager.interceptor);
+
+    final Response response = await dio.get(url, options: options);
+    final Document document = parse(response.data);
+
+    final List<Element> elements = document.querySelectorAll('main tr');
+
+    for (Element element in elements) {
+      final Element? a = element.querySelector('h4 a');
+      final Element? img = element.querySelector('img');
+      final Element? source = element.querySelector('source');
+      if (a == null || (source == null && img == null)) continue;
+
+      final String url = (a.attributes['href'] ?? '').trim();
+      final String name = a.text.trim();
+      final String imageURL = (source?.attributes['srcset'] ?? '').trim();
+      final String imageURL2 = (img?.attributes['src'] ?? '').trim();
+
+      final bool hasImage = imageURL.isNotEmpty || imageURL2.isNotEmpty;
+
+      if (url.isNotEmpty && name.isNotEmpty && hasImage) {
+        items.add(BookItem(
+          id: toId(name),
+          url: url,
+          name: name,
+          headers: headers,
+          imageURL: imageURL.isEmpty ? imageURL2 : imageURL,
+          imageURL2: imageURL2,
+        ));
+      }
+    }
+
+    return items;
+  }
+
   static Map<String, String> get headers {
     return {
       'accept':
@@ -80,55 +123,6 @@ class MangaHostServices {
     };
   }
 }
-
-//       final List<Element> elements =
-//           document.querySelectorAll('#dados .lejBC.w-row');
-
-//       for (var element in elements) {
-//         final Element? h4A = element.querySelector('h4 a');
-//         final Element? source = element.querySelector('source');
-//         if (h4A == null || source == null) continue;
-
-//         final String url = (h4A.attributes['href'] ?? '').trim();
-//         final String name = h4A.text.trim();
-//         final String imageURL = (source.attributes['srcset'] ?? '').trim();
-
-//         if (url.isNotEmpty && name.isNotEmpty && imageURL.isNotEmpty) {
-//           items.add(BookItem(url: url, name: name, imageURL: imageURL));
-//         }
-//       }
-
-//       return items;
-//     } catch (e) {
-//       return [];
-//     }
-//   }
-
-//   static Future<List<BookItem>> search(String value) async {
-//     final List<BookItem> items = [];
-
-//     final Uri uri = Uri.parse('$baseURL/find/$value');
-//     final Response response = await get(uri, headers: headers);
-//     final Document document = parse(response.body);
-
-//     final List<Element> elements = document.querySelectorAll('main tr');
-
-//     for (var element in elements) {
-//       final Element? h4A = element.querySelector('h4 a');
-//       final Element? source = element.querySelector('a source');
-//       if (h4A == null || source == null) continue;
-
-//       final String url = (h4A.attributes['href'] ?? '').trim();
-//       final String name = h4A.text.trim();
-//       final String imageURL = (source.attributes['srcset'] ?? '').trim();
-
-//       if (url.isNotEmpty && name.isNotEmpty && imageURL.isNotEmpty) {
-//         items.add(BookItem(url: url, name: name, imageURL: imageURL));
-//       }
-//     }
-
-//     return items;
-//   }
 
 //   static Future<Book> bookInfo(String url, String name) async {
 //     final Response response = await get(Uri.parse(url), headers: headers);

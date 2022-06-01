@@ -1,67 +1,125 @@
-// import 'package:animes_player/models/book.dart';
-// import 'package:html/dom.dart';
-// import 'package:html/parser.dart';
-// import 'package:http/http.dart';
+import 'package:A.N.R/models/book_item.dart';
+import 'package:A.N.R/utils/to_id.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
+import 'package:html/dom.dart';
+import 'package:html/parser.dart';
 
-// class RandomServices {
-//   static String get baseURL => 'https://randomscan.online';
+class RandomServices {
+  static String get baseURL => 'https://randomscan.online';
 
-//   static Future<List<BookItem>> get lastAdded async {
-//     try {
-//       final List<BookItem> items = [];
+  static final DioCacheManager _cacheManager = DioCacheManager(
+    CacheConfig(baseUrl: baseURL),
+  );
 
-//       final Response response = await get(Uri.parse(baseURL));
-//       final Document document = parse(response.body);
+  static Options _cacheOptions({String? subKey}) {
+    return buildCacheOptions(
+      const Duration(days: 7),
+      subKey: subKey,
+      forceRefresh: true,
+    );
+  }
 
-//       final List<Element> elements =
-//           document.querySelectorAll('#loop-content .page-item-detail');
+  static Future<List<BookItem>> get lastAdded async {
+    try {
+      final List<BookItem> items = [];
 
-//       for (var element in elements) {
-//         final Element? h3A = element.querySelector('h3 a');
-//         final Element? img = element.querySelector('img');
-//         if (h3A == null || img == null) continue;
+      final Dio dio = Dio();
+      final Options options = _cacheOptions();
+      dio.interceptors.add(_cacheManager.interceptor);
 
-//         final String url = (h3A.attributes['href'] ?? '').trim();
-//         final String name = h3A.text.trim();
-//         final String imageURL = (img.attributes['src'] ?? '').trim();
+      final Response response = await dio.get(baseURL, options: options);
 
-//         if (url.isNotEmpty && name.isNotEmpty && imageURL.isNotEmpty) {
-//           items.add(BookItem(url: url, name: name, imageURL: imageURL));
-//         }
-//       }
+      final Document document = parse(response.data);
 
-//       return items;
-//     } catch (e) {
-//       return [];
-//     }
-//   }
+      final List<Element> elements =
+          document.querySelectorAll('#loop-content .page-item-detail');
 
-//   static Future<List<BookItem>> search(String value) async {
-//     final List<BookItem> items = [];
+      for (Element element in elements) {
+        final Element? a = element.querySelector('h3 a');
+        final Element? img = element.querySelector('img');
+        if (a == null || img == null) continue;
 
-//     final Uri uri = Uri.parse('$baseURL/?s=$value&post_type=wp-manga');
-//     final Response response = await get(uri);
-//     final Document document = parse(response.body);
+        final String url = (a.attributes['href'] ?? '').trim();
+        final String name = a.text.trim();
+        final String imageURL = (img.attributes['src'] ?? '').trim();
 
-//     final List<Element> elements =
-//         document.querySelectorAll('.c-tabs-item div.row');
+        final String? srcset = img.attributes['srcset'];
+        final List<String>? sources = srcset == null
+            ? null
+            : '$srcset,'
+                .replaceAll(RegExp(r'([1-9])\w+,'), '')
+                .trim()
+                .split(' ');
 
-//     for (var element in elements) {
-//       final Element? h3A = element.querySelector('h3.h4 > a');
-//       final Element? img = element.querySelector('a img');
-//       if (h3A == null || img == null) continue;
+        final String? imageURL2 = sources?[2].trim();
 
-//       final String url = (h3A.attributes['href'] ?? '').trim();
-//       final String name = h3A.text.trim();
-//       final String imageURL = (img.attributes['src'] ?? '').trim();
+        if (url.isNotEmpty && name.isNotEmpty && imageURL.isNotEmpty) {
+          items.add(BookItem(
+            id: toId(name),
+            url: url,
+            name: name,
+            imageURL: imageURL,
+            imageURL2: imageURL2,
+          ));
+        }
+      }
 
-//       if (url.isNotEmpty && name.isNotEmpty && imageURL.isNotEmpty) {
-//         items.add(BookItem(url: url, name: name, imageURL: imageURL));
-//       }
-//     }
+      return items;
+    } catch (e) {
+      return [];
+    }
+  }
 
-//     return items;
-//   }
+  static Future<List<BookItem>> search(String value) async {
+    final List<BookItem> items = [];
+
+    final String subKey = '?s=$value&post_type=wp-manga';
+    final String url = '$baseURL/$subKey';
+
+    final Dio dio = Dio();
+    final Options options = _cacheOptions(subKey: subKey);
+    dio.interceptors.add(_cacheManager.interceptor);
+
+    final Response response = await dio.get(url, options: options);
+    final Document document = parse(response.data);
+
+    final List<Element> elements =
+        document.querySelectorAll('.c-tabs-item div.row');
+
+    for (var element in elements) {
+      final Element? a = element.querySelector('h3 a');
+      final Element? img = element.querySelector('img');
+      if (a == null || img == null) continue;
+
+      final String url = (a.attributes['href'] ?? '').trim();
+      final String name = a.text.trim();
+      final String imageURL = (img.attributes['src'] ?? '').trim();
+
+      final String? srcset = img.attributes['srcset'];
+      final String? imageURL2 = srcset == null
+          ? null
+          : '$srcset,'
+              .replaceAll(RegExp(r'([1-9])\w+,'), '')
+              .trim()
+              .split(' ')
+              .last
+              .trim();
+
+      if (url.isNotEmpty && name.isNotEmpty && imageURL.isNotEmpty) {
+        items.add(BookItem(
+          id: toId(name),
+          url: url,
+          name: name,
+          imageURL: imageURL,
+          imageURL2: imageURL2,
+        ));
+      }
+    }
+
+    return items;
+  }
+}
 
 //   static Future<Book> bookInfo(String url, String name) async {
 //     final Response response = await get(Uri.parse(url));

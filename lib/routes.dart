@@ -2,6 +2,7 @@
 
 import 'package:A.N.R/screens/home_screen.dart';
 import 'package:A.N.R/screens/login_screen.dart';
+import 'package:A.N.R/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 
 class RoutesName {
@@ -19,6 +20,7 @@ class Routes {
     return {
       RoutesName.LOGIN: (_) => const LoginScreen(),
       RoutesName.HOME: (_) => const HomeScreen(),
+      RoutesName.SEARCH: (_) => const SearchScreen(),
     };
   }
 }
