@@ -1,5 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
+import 'package:A.N.R/screens/about_screen.dart';
 import 'package:A.N.R/screens/book_screen.dart';
 import 'package:A.N.R/screens/favorites_screen.dart';
 import 'package:A.N.R/screens/home_screen.dart';
@@ -13,6 +14,7 @@ class RoutesName {
   static const HOME = '/home';
 
   static const BOOK = '/book';
+  static const ABOUT = '/about';
   static const READER = '/reader';
   static const SEARCH = '/search';
   static const FAVORITES = '/favorites';
@@ -27,6 +29,7 @@ class Routes {
       RoutesName.BOOK: (_) => const BookScreen(),
       RoutesName.READER: (_) => const ReaderScreen(),
       RoutesName.FAVORITES: (_) => const FavoritesScreen(),
+      RoutesName.ABOUT: (_) => const AboutScreen(),
     };
   }
 }

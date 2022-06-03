@@ -19,6 +19,7 @@ class Sinopse extends StatelessWidget {
     return Container(
       margin: margin,
       padding: padding,
+      alignment: Alignment.topLeft,
       child: Text(text, style: const TextStyle(fontSize: 14)),
     );
   }
@@ -43,6 +44,7 @@ class ShortSinopse extends StatelessWidget {
     return Container(
       margin: margin,
       padding: padding,
+      alignment: Alignment.topLeft,
       child: isLoading
           ? const ShortSinopseShimmer()
           : Text(

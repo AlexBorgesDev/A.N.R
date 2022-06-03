@@ -195,7 +195,12 @@ class _BookScreenState extends State<BookScreen> {
                         text:
                             'DETALHES DO ${_bookItem.tag?.toUpperCase() ?? 'LIVRO'}',
                         isLoading: _isLoading,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                            RoutesName.ABOUT,
+                            arguments: _book,
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -236,6 +241,28 @@ class _BookScreenState extends State<BookScreen> {
                         chapters: _chapters,
                         index: index,
                       ),
+                    );
+                  },
+                  onLongPress: () async {
+                    await showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              title: const Text('Baixar capítulo'),
+                              leading: const Icon(Icons.download),
+                              onTap: () => Navigator.of(context).pop('current'),
+                            ),
+                            ListTile(
+                              title: const Text('Baixar todos os capítulos'),
+                              leading: const Icon(Icons.downloading),
+                              onTap: () => Navigator.of(context).pop('all'),
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                 );
