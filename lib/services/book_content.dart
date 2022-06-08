@@ -10,7 +10,7 @@ Future<List<String>> bookContent(String url) async {
     return RandomServices.getContent(url);
   } else if (url.contains('markscans')) {
     return MarkServices.getContent(url);
-  } else if (url.contains('mangahosted')) {
+  } else if (url.contains('mangahosted') || url.contains('mangahost4')) {
     return MangaHostServices.getContent(url);
   }
 

@@ -163,9 +163,10 @@ class MangaHostServices {
     // Chapters
     elements = document.querySelectorAll('section div.chapters div.cap');
     for (Element element in elements) {
-      final String url =
-          (element.querySelector('.tags a')?.attributes['href'] ?? '').trim();
+      final a = element.querySelector('.tags a');
+      if (a == null) continue;
 
+      final String url = (a.attributes['href'] ?? '').trim();
       final String name = element.querySelector('a[rel]')?.text.trim() ?? '';
 
       if (url.isNotEmpty && name.isNotEmpty) {
