@@ -49,6 +49,7 @@ class Favorites {
         final String url = item['url'].toString();
 
         final bool isMH = url.contains('mangahosted.com');
+        final bool isMHHeader = isMH || url.contains('mangahost4.com');
 
         favorites[element.key!] = BookItem(
           id: item['id'],
@@ -57,7 +58,7 @@ class Favorites {
           name: item['name'],
           imageURL: item['imageURL'],
           imageURL2: item['imageURL2'],
-          headers: isMH ? MangaHostServices.headers : null,
+          headers: isMHHeader ? MangaHostServices.headers : null,
         );
       }
 
