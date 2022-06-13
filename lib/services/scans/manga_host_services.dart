@@ -53,7 +53,7 @@ class MangaHostServices {
 
         final bool hasImage = imageURL.isNotEmpty || imageURL2.isNotEmpty;
 
-        if (url.isNotEmpty && name.isNotEmpty && hasImage) {
+        if (url.isNotEmpty && name.isNotEmpty && hasImage && !is18) {
           items.add(BookItem(
             id: toId(name),
             url: url,
