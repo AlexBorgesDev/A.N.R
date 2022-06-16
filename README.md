@@ -1,16 +1,27 @@
-# anr
+<p align="center">
+  <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/AlexBorgesDev/anr.svg" />
+  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/AlexBorgesDev/anr.svg" />
+  <img alt="Package License" src="https://img.shields.io/github/license/AlexBorgesDev/anr.svg" />
+</p>
 
-A new Flutter project.
+# A.N.R
 
-## Getting Started
+A.N.R é uma aplicação mobile feita com Flutter. Onde você pode encontrar e ler mangás, manhwa, manhua, novels e webtoons, tendo seu histórico de leitura e favoritos salvos na nuvem, através do Firebase.
 
-This project is a starting point for a Flutter application.
+> Aplicativo não testado em sistemas IOS.
 
-A few resources to get you started if this is your first Flutter project:
+## Funcionalidades
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Contas Individuais - Google
+- Leitura
+- Pesquisa
+- Favoritos
+- Capítulos lidos
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Livros
+
+Nenhum dos livros encontrados estão armazenados em servidor próprio. Todos eles são obtidos de diversos sites através de **web scraping**.
+
+## Licença
+
+[MIT](./LICENSE)
