@@ -22,6 +22,15 @@ A.N.R é uma aplicação mobile feita com Flutter. Onde você pode encontrar e l
 
 Nenhum dos livros encontrados estão armazenados em servidor próprio. Todos eles são obtidos de diversos sites através de **web scraping**.
 
+## Screenshots
+
+<p>
+  <img width="24.5%" src="./.github/Screenshot_20220617-103218.png" />
+  <img width="24.5%" src="./.github/Screenshot_20220617-103236.png" />
+  <img width="24.5%" src="./.github/Screenshot_20220617-103256.png" />
+  <img width="24.5%" src="./.github/Screenshot_20220617-104201.png" />
+</p>
+
 ## Licença
 
 [MIT](./LICENSE)
