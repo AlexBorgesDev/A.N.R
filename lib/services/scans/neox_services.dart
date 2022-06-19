@@ -14,11 +14,11 @@ class NeoxServices {
     CacheConfig(baseUrl: baseURL),
   );
 
-  static Options _cacheOptions({String? subKey}) {
+  static Options _cacheOptions({String? subKey, bool? forceRefresh}) {
     return buildCacheOptions(
       const Duration(days: 7),
       subKey: subKey,
-      forceRefresh: true,
+      forceRefresh: forceRefresh ?? true,
     );
   }
 
@@ -128,7 +128,7 @@ class NeoxServices {
 
   static Future<Book> bookInfo(String url, String name) async {
     final Dio dio = Dio();
-    Options options = _cacheOptions(subKey: url);
+    Options options = _cacheOptions(subKey: url, forceRefresh: false);
     dio.interceptors.add(_cacheManager.interceptor);
 
     Response response = await dio.get(url, options: options);
