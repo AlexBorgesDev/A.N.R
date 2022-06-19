@@ -15,5 +15,17 @@ class Book {
     this.type,
   });
 
-  String get totalChapters => chapters.length.toString().padLeft(2, '0');
+  String get totalChapters {
+    final String lastChapter = chapters.first.name;
+
+    final String totalChapter = lastChapter
+        .replaceAll('Cap.', '')
+        .replaceAll(RegExp(r'[^0-9.]'), '')
+        .replaceAll(RegExp(r','), '.')
+        .split('.')
+        .first
+        .padLeft(2, '0');
+
+    return totalChapter;
+  }
 }
