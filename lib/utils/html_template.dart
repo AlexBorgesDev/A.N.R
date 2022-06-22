@@ -108,7 +108,7 @@ const String htmlTemplate = '''
         let read = false;
         let loaded = 0;
         let callNext = false;
-        const sources = data.split(',,');
+        const sources = data.split(',,separator,,');
 
         for (const src of sources) {
           const img = document.createElement('img');

@@ -1,12 +1,18 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:A.N.R/models/book.dart';
 import 'package:A.N.R/models/chapter.dart';
 import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/screens/reader_screen.dart';
 import 'package:A.N.R/services/book_info.dart';
+import 'package:A.N.R/services/download_service.dart';
 import 'package:A.N.R/services/favorites.dart';
+import 'package:A.N.R/store/downloaded_store.dart';
 import 'package:A.N.R/store/favorites_store.dart';
 import 'package:A.N.R/store/historic_store.dart';
 import 'package:A.N.R/styles/colors.dart';
+import 'package:A.N.R/utils/books_path.dart';
 import 'package:A.N.R/widgets/accent_subtitle.dart';
 import 'package:A.N.R/widgets/sinopse.dart';
 import 'package:A.N.R/widgets/to_info_button.dart';
@@ -29,12 +35,15 @@ class _BookScreenState extends State<BookScreen> {
 
   late BookItem _bookItem;
   late Favorites _favorites;
+  late DownloadedStore _downloaded;
 
   Book? _book;
   List<Chapter> _chapters = [];
 
   bool _isLoading = true;
   bool _pinnedTitle = false;
+
+  StreamSubscription<FileSystemEvent>? _folderListen;
 
   void _scrollListener() {
     final double imageHeight = (70 * MediaQuery.of(context).size.height) / 100;
@@ -46,12 +55,41 @@ class _BookScreenState extends State<BookScreen> {
     }
   }
 
+  Future<void> _setWatchFolder() async {
+    if (_folderListen != null) {
+      _folderListen?.cancel();
+      _folderListen = null;
+    }
+
+    try {
+      final Directory bookDir = await BooksPath.book(_bookItem.id);
+
+      if (!bookDir.existsSync()) {
+        final Directory? appDir = await BooksPath.rootDir;
+        if (appDir == null) return;
+
+        _folderListen = appDir.watch().listen((event) {
+          if (event.path.contains(_bookItem.id)) _setWatchFolder();
+        });
+      } else {
+        _folderListen = bookDir.watch().listen((event) {
+          if (event.isDirectory) {
+            final String name = event.path.split('/').reversed.first.trim();
+            _downloaded.add(name);
+          }
+        });
+      }
+    } catch (_) {}
+  }
+
   @override
   void didChangeDependencies() {
     final FavoritesStore store = Provider.of<FavoritesStore>(context);
+    final DownloadedStore downloaded = Provider.of<DownloadedStore>(context);
 
     _bookItem = ModalRoute.of(context)!.settings.arguments as BookItem;
     _favorites = Favorites(book: _bookItem, store: store, context: context);
+    _downloaded = downloaded;
 
     bookInfo(_bookItem.url, _bookItem.name).then((value) {
       if (!mounted) return;
@@ -74,6 +112,9 @@ class _BookScreenState extends State<BookScreen> {
       );
     });
 
+    BooksPath.getChapters(_bookItem.id).then((value) => downloaded.set(value));
+    _setWatchFolder();
+
     super.didChangeDependencies();
   }
 
@@ -87,6 +128,9 @@ class _BookScreenState extends State<BookScreen> {
   void dispose() {
     _scroll.removeListener(_scrollListener);
     _scroll.dispose();
+    _downloaded.reset();
+    _folderListen?.cancel();
+    _folderListen = null;
 
     super.dispose();
   }
@@ -94,6 +138,7 @@ class _BookScreenState extends State<BookScreen> {
   @override
   Widget build(BuildContext context) {
     final HistoricStore store = Provider.of<HistoricStore>(context);
+    final DownloadedStore downloaded = Provider.of<DownloadedStore>(context);
 
     return Scaffold(
       body: CustomScrollView(
@@ -206,13 +251,34 @@ class _BookScreenState extends State<BookScreen> {
                   ),
                   Container(
                     width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: const Text(
-                      'Capítulos',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    margin: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Capítulos',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Observer(builder: (ctx) {
+                          if (_chapters.length == downloaded.total) {
+                            return const IconButton(
+                              icon: Icon(Icons.download_done_rounded),
+                              onPressed: null,
+                            );
+                          }
+
+                          return IconButton(
+                            icon: const Icon(Icons.download),
+                            onPressed: () {
+                              _setWatchFolder();
+                              DownloadService.download(_bookItem.id, _chapters);
+                            },
+                          );
+                        })
+                      ],
                     ),
                   ),
                 ],
@@ -230,8 +296,18 @@ class _BookScreenState extends State<BookScreen> {
                     final book = store.historic[_bookItem.id];
                     final bool read = book?.contains(chapter.id) ?? false;
 
-                    if (!read) return const SizedBox();
-                    return const Icon(Icons.visibility);
+                    final List<Widget> children = [];
+
+                    if (read) children.add(const Icon(Icons.visibility));
+                    if (downloaded.chapters.containsKey(chapter.id)) {
+                      children.add(const SizedBox(width: 16));
+                      children.add(const Icon(Icons.download_done_rounded));
+                    }
+
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: children,
+                    );
                   })),
                   onTap: () {
                     Navigator.of(context).pushNamed(
@@ -244,7 +320,9 @@ class _BookScreenState extends State<BookScreen> {
                     );
                   },
                   onLongPress: () async {
-                    await showModalBottomSheet(
+                    if (downloaded.chapters.containsKey(chapter.id)) return;
+
+                    final String? action = await showModalBottomSheet<String>(
                       context: context,
                       builder: (context) {
                         return Column(
@@ -253,17 +331,19 @@ class _BookScreenState extends State<BookScreen> {
                             ListTile(
                               title: const Text('Baixar capítulo'),
                               leading: const Icon(Icons.download),
-                              onTap: () => Navigator.of(context).pop('current'),
-                            ),
-                            ListTile(
-                              title: const Text('Baixar todos os capítulos'),
-                              leading: const Icon(Icons.downloading),
-                              onTap: () => Navigator.of(context).pop('all'),
+                              onTap: () {
+                                Navigator.of(context).pop('download');
+                              },
                             ),
                           ],
                         );
                       },
                     );
+
+                    if (action == 'download') {
+                      _setWatchFolder();
+                      DownloadService.download(_bookItem.id, [chapter]);
+                    }
                   },
                 );
               },

@@ -18,7 +18,7 @@ class ReaderJS {
   }
 
   Future<void> finishedChapters() async {
-    controller.runJavascript("insertFinish();");
+    await controller.runJavascript("insertFinish();");
   }
 
   Future<void> insertContent(
@@ -26,7 +26,8 @@ class ReaderJS {
     int index,
     String name,
   ) async {
-    final String images = sources.join(',,');
-    controller.runJavascript("insertContent('$images', $index, '$name');");
+    final String images = sources.join(',,separator,,');
+    await controller
+        .runJavascript("insertContent('$images', $index, '$name');");
   }
 }

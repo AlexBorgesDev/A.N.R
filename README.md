@@ -17,6 +17,7 @@ A.N.R é uma aplicação mobile feita com Flutter. Onde você pode encontrar e l
 - Pesquisa
 - Favoritos
 - Capítulos lidos
+- Leitura offline - Download de capítulos
 
 ## Livros
 

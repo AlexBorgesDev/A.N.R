@@ -6,6 +6,7 @@ import 'package:A.N.R/services/book_content.dart';
 import 'package:A.N.R/services/historic.dart';
 import 'package:A.N.R/store/historic_store.dart';
 import 'package:A.N.R/styles/colors.dart';
+import 'package:A.N.R/utils/books_path.dart';
 import 'package:A.N.R/utils/html_template.dart';
 import 'package:A.N.R/utils/reader_js.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,9 @@ class _ReaderScreenState extends State<ReaderScreen> {
   Future<void> _getContent() async {
     final Chapter chapter = _chapters[_index];
 
-    final List<String> content = await bookContent(chapter.url);
+    List<String> content = await BooksPath.getContent(_book.id, chapter.id);
+    if (content.isEmpty) content = await bookContent(chapter.url);
+
     await _js!.insertContent(content, _index, chapter.name);
 
     if (_finished) await _js!.finishedChapters();
@@ -92,8 +95,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
         gestureNavigationEnabled: true,
         onWebViewCreated: (controller) {
           _js = ReaderJS(controller);
-          _getContent();
         },
+        onPageFinished: (_) => _getContent(),
         javascriptChannels: {
           JavascriptChannel(name: 'onLoad', onMessageReceived: _onLoad),
           JavascriptChannel(name: 'onNext', onMessageReceived: _onNext),

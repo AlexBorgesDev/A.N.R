@@ -16,8 +16,9 @@ class Book {
   });
 
   String get totalChapters {
-    final String lastChapter = chapters.first.name;
+    if (chapters.isEmpty) return '00';
 
+    final String lastChapter = chapters.first.name;
     final String totalChapter = lastChapter
         .replaceAll('Cap.', '')
         .replaceAll(RegExp(r'[^0-9.]'), '')
