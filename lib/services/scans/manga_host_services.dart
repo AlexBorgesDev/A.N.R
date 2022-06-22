@@ -8,7 +8,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
 class MangaHostServices {
-  static String get baseURL => 'https://mangahost4.com';
+  static String get baseURL => 'https://mangahosted.com';
 
   static final DioCacheManager _cacheManager = DioCacheManager(
     CacheConfig(baseUrl: baseURL),
