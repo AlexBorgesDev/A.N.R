@@ -1,4 +1,5 @@
 import 'package:A.N.R/models/book_item.dart';
+import 'package:collection/collection.dart';
 import 'package:mobx/mobx.dart';
 
 part 'favorites_store.g.dart';
@@ -10,7 +11,11 @@ abstract class FavoritesStoreBase with Store {
   ObservableMap<String, BookItem> favorites = ObservableMap();
 
   @computed
-  List<BookItem> get items => favorites.values.toList();
+  List<BookItem> get items {
+    final List<BookItem> favoritesList = favorites.values.toList();
+    favoritesList.sort((a, b) => compareNatural(a.id, b.id));
+    return favoritesList;
+  }
 
   @action
   void set(Map<String, BookItem> data) => favorites.addAll(data);
