@@ -16,7 +16,7 @@ class RandomServices {
 
   static Options _cacheOptions({String? subKey, bool? forceRefresh}) {
     return buildCacheOptions(
-      const Duration(days: 7),
+      const Duration(days: 15),
       subKey: subKey,
       forceRefresh: forceRefresh ?? true,
     );

@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:io';
-
 import 'package:A.N.R/models/book.dart';
 import 'package:A.N.R/models/chapter.dart';
 import 'package:A.N.R/routes.dart';
@@ -8,7 +5,7 @@ import 'package:A.N.R/screens/reader_screen.dart';
 import 'package:A.N.R/services/book_info.dart';
 import 'package:A.N.R/services/download_service.dart';
 import 'package:A.N.R/services/favorites.dart';
-import 'package:A.N.R/store/downloaded_store.dart';
+import 'package:A.N.R/store/download_store.dart';
 import 'package:A.N.R/store/favorites_store.dart';
 import 'package:A.N.R/store/historic_store.dart';
 import 'package:A.N.R/styles/colors.dart';
@@ -35,7 +32,7 @@ class _BookScreenState extends State<BookScreen> {
 
   late BookItem _bookItem;
   late Favorites _favorites;
-  late DownloadedStore _downloaded;
+  late DownloadService _downloadService;
 
   Book? _book;
   List<Chapter> _chapters = [];
@@ -43,7 +40,7 @@ class _BookScreenState extends State<BookScreen> {
   bool _isLoading = true;
   bool _pinnedTitle = false;
 
-  StreamSubscription<FileSystemEvent>? _folderListen;
+  Map<String, dynamic> _downloaded = {};
 
   void _scrollListener() {
     final double imageHeight = (70 * MediaQuery.of(context).size.height) / 100;
@@ -55,41 +52,14 @@ class _BookScreenState extends State<BookScreen> {
     }
   }
 
-  Future<void> _setWatchFolder() async {
-    if (_folderListen != null) {
-      _folderListen?.cancel();
-      _folderListen = null;
-    }
-
-    try {
-      final Directory bookDir = await BooksPath.book(_bookItem.id);
-
-      if (!bookDir.existsSync()) {
-        final Directory? appDir = await BooksPath.rootDir;
-        if (appDir == null) return;
-
-        _folderListen = appDir.watch().listen((event) {
-          if (event.path.contains(_bookItem.id)) _setWatchFolder();
-        });
-      } else {
-        _folderListen = bookDir.watch().listen((event) {
-          if (event.isDirectory) {
-            final String name = event.path.split('/').reversed.first.trim();
-            _downloaded.add(name);
-          }
-        });
-      }
-    } catch (_) {}
-  }
-
   @override
   void didChangeDependencies() {
     final FavoritesStore store = Provider.of<FavoritesStore>(context);
-    final DownloadedStore downloaded = Provider.of<DownloadedStore>(context);
+    final DownloadStore dStore = Provider.of<DownloadStore>(context);
 
     _bookItem = ModalRoute.of(context)!.settings.arguments as BookItem;
     _favorites = Favorites(book: _bookItem, store: store, context: context);
-    _downloaded = downloaded;
+    _downloadService = DownloadService(store: dStore, bookId: _bookItem.id);
 
     bookInfo(_bookItem.url, _bookItem.name).then((value) {
       if (!mounted) return;
@@ -112,8 +82,9 @@ class _BookScreenState extends State<BookScreen> {
       );
     });
 
-    BooksPath.getChapters(_bookItem.id).then((value) => downloaded.set(value));
-    _setWatchFolder();
+    BooksPath.getChapters(_bookItem.id).then((value) {
+      _downloaded.addAll(value);
+    });
 
     super.didChangeDependencies();
   }
@@ -128,17 +99,33 @@ class _BookScreenState extends State<BookScreen> {
   void dispose() {
     _scroll.removeListener(_scrollListener);
     _scroll.dispose();
-    _downloaded.reset();
-    _folderListen?.cancel();
-    _folderListen = null;
 
     super.dispose();
+  }
+
+  bool _downloadingChapter(DownloadStore store, Chapter chapter) {
+    final String item = store.downloading[_bookItem.id] ?? '';
+    return item.contains(chapter.id);
+  }
+
+  bool _downloadedChapter(DownloadStore store, Chapter chapter) {
+    final bool inStore = store.downloaded.contains(chapter);
+    return inStore || _downloaded.containsKey(chapter.id);
+  }
+
+  bool _downloadedAll(DownloadStore store) {
+    final bool inState = _chapters.length == _downloaded.length;
+
+    final String storeItem = store.downloading[_bookItem.id] ?? '';
+    final bool inStore = storeItem.contains('all');
+
+    return inState || inStore;
   }
 
   @override
   Widget build(BuildContext context) {
     final HistoricStore store = Provider.of<HistoricStore>(context);
-    final DownloadedStore downloaded = Provider.of<DownloadedStore>(context);
+    final DownloadStore dStore = Provider.of<DownloadStore>(context);
 
     return Scaffold(
       body: CustomScrollView(
@@ -263,7 +250,7 @@ class _BookScreenState extends State<BookScreen> {
                           ),
                         ),
                         Observer(builder: (ctx) {
-                          if (_chapters.length == downloaded.total) {
+                          if (_isLoading || _downloadedAll(dStore)) {
                             return const IconButton(
                               icon: Icon(Icons.download_done_rounded),
                               onPressed: null,
@@ -273,8 +260,7 @@ class _BookScreenState extends State<BookScreen> {
                           return IconButton(
                             icon: const Icon(Icons.download),
                             onPressed: () {
-                              _setWatchFolder();
-                              DownloadService.download(_bookItem.id, _chapters);
+                              _downloadService.download(_chapters);
                             },
                           );
                         })
@@ -296,12 +282,18 @@ class _BookScreenState extends State<BookScreen> {
                     final book = store.historic[_bookItem.id];
                     final bool read = book?.contains(chapter.id) ?? false;
 
+                    final downloaded = _downloadedChapter(dStore, chapter);
+                    final downloading = _downloadingChapter(dStore, chapter);
+
                     final List<Widget> children = [];
 
                     if (read) children.add(const Icon(Icons.visibility));
-                    if (downloaded.chapters.containsKey(chapter.id)) {
+                    if (downloaded) {
                       children.add(const SizedBox(width: 16));
                       children.add(const Icon(Icons.download_done_rounded));
+                    } else if (downloading) {
+                      children.add(const SizedBox(width: 16));
+                      children.add(const Icon(Icons.downloading_rounded));
                     }
 
                     return Row(
@@ -320,7 +312,10 @@ class _BookScreenState extends State<BookScreen> {
                     );
                   },
                   onLongPress: () async {
-                    if (downloaded.chapters.containsKey(chapter.id)) return;
+                    final downloaded = _downloadedChapter(dStore, chapter);
+                    final downloading = _downloadingChapter(dStore, chapter);
+
+                    if (downloaded || downloading) return;
 
                     final String? action = await showModalBottomSheet<String>(
                       context: context,
@@ -331,19 +326,14 @@ class _BookScreenState extends State<BookScreen> {
                             ListTile(
                               title: const Text('Baixar capítulo'),
                               leading: const Icon(Icons.download),
-                              onTap: () {
-                                Navigator.of(context).pop('download');
-                              },
+                              onTap: () => Navigator.of(context).pop('down'),
                             ),
                           ],
                         );
                       },
                     );
 
-                    if (action == 'download') {
-                      _setWatchFolder();
-                      DownloadService.download(_bookItem.id, [chapter]);
-                    }
+                    if (action == 'down') _downloadService.download([chapter]);
                   },
                 );
               },

@@ -1,6 +1,3 @@
-import 'dart:isolate';
-import 'dart:ui';
-
 import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/services/favorites.dart';
@@ -12,7 +9,6 @@ import 'package:A.N.R/services/scans/random_services.dart';
 import 'package:A.N.R/widgets/book_element_horizontal_list.dart';
 import 'package:A.N.R/widgets/section_list_title.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,8 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<BookItem> _mark = [];
   List<BookItem> _random = [];
   List<BookItem> _mangaHost = [];
-
-  final ReceivePort _port = ReceivePort();
 
   Future<void> _handleGetDatas() async {
     final items = await Future.wait([
@@ -55,12 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _handleGetDatas();
 
     super.initState();
-
-    IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
-
-    _port.listen((dynamic data) {});
-    FlutterDownloader.registerCallback(downloadCallback);
   }
 
   @override
@@ -68,19 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
     Favorites.getAll(context);
     Historic.getAll(context);
     super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-    super.dispose();
-  }
-
-  @pragma('vm:entry-point')
-  static void downloadCallback(String id, DownloadTaskStatus status, int pg) {
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send?.send([id, status, pg]);
   }
 
   @override

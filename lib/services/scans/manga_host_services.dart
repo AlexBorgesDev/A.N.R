@@ -16,7 +16,7 @@ class MangaHostServices {
 
   static Options _cacheOptions({String? subKey}) {
     return buildCacheOptions(
-      const Duration(days: 7),
+      const Duration(days: 15),
       subKey: subKey,
       forceRefresh: true,
       options: Options(headers: headers),

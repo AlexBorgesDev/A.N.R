@@ -30,6 +30,9 @@ class BooksPath {
     final Map<String, dynamic> chapters = {};
 
     for (FileSystemEntity folder in folders) {
+      final Directory folderDir = Directory(folder.path);
+      if (folderDir.listSync().isEmpty) continue;
+
       final name = basename(folder.path);
       chapters[name] = null;
     }
@@ -40,6 +43,8 @@ class BooksPath {
   static Future<List<String>> getContent(String bookId, String chapter) async {
     Directory directory = await book(bookId);
     directory = Directory('${directory.path}/$chapter');
+
+    if (!directory.existsSync()) return [];
 
     final List<FileSystemEntity> items = directory.listSync();
     final List<String> paths = items.map((item) => item.path).toList();
