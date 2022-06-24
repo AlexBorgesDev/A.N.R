@@ -1,15 +1,19 @@
+import 'dart:isolate';
+import 'dart:ui';
+
+import 'package:A.N.R/constants/ports.dart';
+import 'package:A.N.R/databases/downloads_db.dart';
 import 'package:A.N.R/models/book.dart';
 import 'package:A.N.R/models/chapter.dart';
+import 'package:A.N.R/models/download.dart';
 import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/screens/reader_screen.dart';
 import 'package:A.N.R/services/book_info.dart';
-import 'package:A.N.R/services/download_service.dart';
 import 'package:A.N.R/services/favorites.dart';
-import 'package:A.N.R/store/download_store.dart';
 import 'package:A.N.R/store/favorites_store.dart';
 import 'package:A.N.R/store/historic_store.dart';
 import 'package:A.N.R/styles/colors.dart';
-import 'package:A.N.R/utils/books_path.dart';
+import 'package:A.N.R/utils/start_download.dart';
 import 'package:A.N.R/widgets/accent_subtitle.dart';
 import 'package:A.N.R/widgets/sinopse.dart';
 import 'package:A.N.R/widgets/to_info_button.dart';
@@ -28,19 +32,18 @@ class BookScreen extends StatefulWidget {
 }
 
 class _BookScreenState extends State<BookScreen> {
+  final ReceivePort _port = ReceivePort();
   final ScrollController _scroll = ScrollController();
 
   late BookItem _bookItem;
   late Favorites _favorites;
-  late DownloadService _downloadService;
 
   Book? _book;
   List<Chapter> _chapters = [];
+  Map<String, Download> _download = {};
 
   bool _isLoading = true;
   bool _pinnedTitle = false;
-
-  Map<String, dynamic> _downloaded = {};
 
   void _scrollListener() {
     final double imageHeight = (70 * MediaQuery.of(context).size.height) / 100;
@@ -52,14 +55,103 @@ class _BookScreenState extends State<BookScreen> {
     }
   }
 
+  bool _downloadedAll() {
+    if (_download.length != _chapters.length) return false;
+    bool downloadedAll = false;
+
+    for (Download item in _download.values) {
+      if (!item.finished) {
+        downloadedAll = false;
+        break;
+      }
+
+      downloadedAll = true;
+    }
+
+    return downloadedAll;
+  }
+
+  Future<void> _getDownloadItem() async {
+    final List<Download> items = await DownloadsDB.db.allByBookId(_bookItem.id);
+    final Map<String, Download> download = {};
+
+    for (Download item in items) {
+      download[item.chapterId] = item;
+    }
+
+    setState(() => _download = download);
+  }
+
+  void _sendListening(dynamic data) {
+    final DownloadSend item = data as DownloadSend;
+    if (item.data.bookId == _bookItem.id) {
+      if (item.type == DownloadSendTypes.error) {
+        setState(() => _download.remove(item.data.chapterId));
+      } else {
+        setState(() {
+          _download.update(
+            item.data.chapterId,
+            (_) => item.data,
+            ifAbsent: () => item.data,
+          );
+        });
+      }
+    }
+  }
+
+  Future<void> _downloadMany() async {
+    await DownloadsDB.db.insertMany(_bookItem.id, _chapters);
+
+    _getDownloadItem();
+    startDownload();
+  }
+
+  Future<void> _downloadOne(Chapter chapter) async {
+    final Download item = await DownloadsDB.db.insert(
+      _bookItem.id,
+      chapter,
+    );
+
+    setState(() {
+      _download.update(item.chapterId, (_) => item, ifAbsent: () => item);
+    });
+    startDownload();
+  }
+
+  Widget _downloadAllButton() {
+    if (_downloadedAll()) {
+      return const IconButton(
+        onPressed: null,
+        icon: Icon(Icons.download_done_rounded),
+      );
+    }
+
+    bool downloading = false;
+    for (Download item in _download.values) {
+      if (!item.finished) {
+        downloading = true;
+        break;
+      }
+    }
+
+    return IconButton(
+      icon: downloading
+          ? const Icon(Icons.downloading_rounded)
+          : const Icon(Icons.download_rounded),
+      onPressed: _isLoading ? null : _downloadMany,
+    );
+  }
+
   @override
   void didChangeDependencies() {
     final FavoritesStore store = Provider.of<FavoritesStore>(context);
-    final DownloadStore dStore = Provider.of<DownloadStore>(context);
 
     _bookItem = ModalRoute.of(context)!.settings.arguments as BookItem;
     _favorites = Favorites(book: _bookItem, store: store, context: context);
-    _downloadService = DownloadService(store: dStore, bookId: _bookItem.id);
+
+    IsolateNameServer.registerPortWithName(_port.sendPort, Ports.DOWNLOAD);
+    _port.listen(_sendListening);
+    _getDownloadItem();
 
     bookInfo(_bookItem.url, _bookItem.name).then((value) {
       if (!mounted) return;
@@ -82,10 +174,6 @@ class _BookScreenState extends State<BookScreen> {
       );
     });
 
-    BooksPath.getChapters(_bookItem.id).then((value) {
-      _downloaded.addAll(value);
-    });
-
     super.didChangeDependencies();
   }
 
@@ -99,33 +187,14 @@ class _BookScreenState extends State<BookScreen> {
   void dispose() {
     _scroll.removeListener(_scrollListener);
     _scroll.dispose();
+    IsolateNameServer.removePortNameMapping(Ports.DOWNLOAD);
 
     super.dispose();
-  }
-
-  bool _downloadingChapter(DownloadStore store, Chapter chapter) {
-    final String item = store.downloading[_bookItem.id] ?? '';
-    return item.contains(chapter.id);
-  }
-
-  bool _downloadedChapter(DownloadStore store, Chapter chapter) {
-    final bool inStore = store.downloaded.contains(chapter);
-    return inStore || _downloaded.containsKey(chapter.id);
-  }
-
-  bool _downloadedAll(DownloadStore store) {
-    final bool inState = _chapters.length == _downloaded.length;
-
-    final String storeItem = store.downloading[_bookItem.id] ?? '';
-    final bool inStore = storeItem.contains('all');
-
-    return inState || inStore;
   }
 
   @override
   Widget build(BuildContext context) {
     final HistoricStore store = Provider.of<HistoricStore>(context);
-    final DownloadStore dStore = Provider.of<DownloadStore>(context);
 
     return Scaffold(
       body: CustomScrollView(
@@ -249,21 +318,7 @@ class _BookScreenState extends State<BookScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Observer(builder: (ctx) {
-                          if (_isLoading || _downloadedAll(dStore)) {
-                            return const IconButton(
-                              icon: Icon(Icons.download_done_rounded),
-                              onPressed: null,
-                            );
-                          }
-
-                          return IconButton(
-                            icon: const Icon(Icons.download),
-                            onPressed: () {
-                              _downloadService.download(_chapters);
-                            },
-                          );
-                        })
+                        _downloadAllButton(),
                       ],
                     ),
                   ),
@@ -275,6 +330,8 @@ class _BookScreenState extends State<BookScreen> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final Chapter chapter = _chapters[index];
+                final Download? downloadChapter = _download[chapter.id];
+
                 return ListTile(
                   title: Text(chapter.name),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 32),
@@ -282,16 +339,13 @@ class _BookScreenState extends State<BookScreen> {
                     final book = store.historic[_bookItem.id];
                     final bool read = book?.contains(chapter.id) ?? false;
 
-                    final downloaded = _downloadedChapter(dStore, chapter);
-                    final downloading = _downloadingChapter(dStore, chapter);
-
                     final List<Widget> children = [];
 
                     if (read) children.add(const Icon(Icons.visibility));
-                    if (downloaded) {
+                    if (downloadChapter?.finished == true) {
                       children.add(const SizedBox(width: 16));
                       children.add(const Icon(Icons.download_done_rounded));
-                    } else if (downloading) {
+                    } else if (downloadChapter != null) {
                       children.add(const SizedBox(width: 16));
                       children.add(const Icon(Icons.downloading_rounded));
                     }
@@ -301,8 +355,8 @@ class _BookScreenState extends State<BookScreen> {
                       children: children,
                     );
                   })),
-                  onTap: () {
-                    Navigator.of(context).pushNamed(
+                  onTap: () async {
+                    await Navigator.of(context).pushNamed(
                       RoutesName.READER,
                       arguments: ReaderArguments(
                         book: _bookItem,
@@ -310,10 +364,12 @@ class _BookScreenState extends State<BookScreen> {
                         index: index,
                       ),
                     );
+
+                    _getDownloadItem();
                   },
                   onLongPress: () async {
-                    final downloaded = _downloadedChapter(dStore, chapter);
-                    final downloading = _downloadingChapter(dStore, chapter);
+                    final downloaded = downloadChapter?.finished == true;
+                    final downloading = downloadChapter != null;
 
                     if (downloaded || downloading) return;
 
@@ -333,7 +389,7 @@ class _BookScreenState extends State<BookScreen> {
                       },
                     );
 
-                    if (action == 'down') _downloadService.download([chapter]);
+                    if (action == 'down') _downloadOne(chapter);
                   },
                 );
               },

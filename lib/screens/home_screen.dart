@@ -1,3 +1,4 @@
+import 'package:A.N.R/databases/downloads_db.dart';
 import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/services/favorites.dart';
@@ -6,6 +7,7 @@ import 'package:A.N.R/services/scans/manga_host_services.dart';
 import 'package:A.N.R/services/scans/mark_services.dart';
 import 'package:A.N.R/services/scans/neox_services.dart';
 import 'package:A.N.R/services/scans/random_services.dart';
+import 'package:A.N.R/utils/start_download.dart';
 import 'package:A.N.R/widgets/book_element_horizontal_list.dart';
 import 'package:A.N.R/widgets/section_list_title.dart';
 import 'package:flutter/material.dart';
@@ -43,10 +45,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _handleStartDownload() async {
+    final items = await DownloadsDB.db.notFinished;
+    if (items.isNotEmpty) startDownload();
+  }
+
   @override
   void initState() {
     FlutterNativeSplash.remove();
     _handleGetDatas();
+    _handleStartDownload();
 
     super.initState();
   }
