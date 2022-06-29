@@ -36,7 +36,10 @@ class Favorites {
   static Future<void> getAll(BuildContext context) async {
     if (ref == null) return _snackError(context);
 
-    final FavoritesStore store = Provider.of<FavoritesStore>(context);
+    final FavoritesStore store = Provider.of<FavoritesStore>(
+      context,
+      listen: false,
+    );
 
     try {
       final DataSnapshot snapshot = await ref!.get();
@@ -53,7 +56,7 @@ class Favorites {
 
         favorites[element.key!] = BookItem(
           id: item['id'],
-          url: isMH ? url.replaceAll('mangahosted.com', 'mangahost4.com') : url,
+          url: url,
           tag: item['tag'],
           name: item['name'],
           imageURL: item['imageURL'],
