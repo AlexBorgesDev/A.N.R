@@ -70,7 +70,10 @@ class _ReaderScreenState extends State<ReaderScreen>
     if (!_isLoading) return;
     _isLoading = false;
 
-    if (_initPosition != null) await _js!.scrollTo(_initPosition!);
+    if (_initPosition != null) {
+      final bool continueByHistoric = await _continueByHistoric();
+      if (continueByHistoric) await _js!.scrollTo(_initPosition!);
+    }
 
     await _js!.removeLoading();
   }
@@ -147,6 +150,32 @@ class _ReaderScreenState extends State<ReaderScreen>
         },
       ),
     );
+  }
+
+  Future<bool> _continueByHistoric() async {
+    final bool? continueByHistoric = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Continuar de onde parou'),
+          content: const Text(
+            'Você já começou a ler esse livro, desejá continuar a leitura de onde parou?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('NÃO'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('SIM'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return continueByHistoric ?? false;
   }
 }
 
