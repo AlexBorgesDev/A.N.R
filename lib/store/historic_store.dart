@@ -6,24 +6,25 @@ class HistoricStore = HistoricStoreBase with _$HistoricStore;
 
 abstract class HistoricStoreBase with Store {
   @observable
-  ObservableMap<String, ObservableList<String>> historic = ObservableMap();
+  ObservableMap<String, ObservableMap<String, double>> historic =
+      ObservableMap();
 
   @action
-  void set(Map<String, ObservableList<String>> data) {
+  void set(Map<String, ObservableMap<String, double>> data) {
     historic.addAll(data);
   }
 
   @action
-  void add(String bookID, String id) {
-    ObservableList<String>? book = historic[bookID];
+  void add(String bookID, String id, double position) {
+    ObservableMap<String, double>? book = historic[bookID];
 
     if (book == null) {
-      historic[bookID] = ObservableList();
+      historic[bookID] = ObservableMap();
 
       book = historic[bookID];
-      book!.add(id);
+      book![id] = position;
     } else {
-      book.add(id);
+      book.update(id, (_) => position, ifAbsent: () => position);
     }
   }
 

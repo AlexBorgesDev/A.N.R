@@ -9,7 +9,7 @@ class ReaderJS {
     await controller.runJavascript('''window.scrollTo({
       top: $position,
       left: 0,
-      behavior: 'smooth',
+      behavior: 'auto',
     });''');
   }
 

@@ -12,13 +12,13 @@ mixin _$HistoricStore on HistoricStoreBase, Store {
   final _$historicAtom = Atom(name: 'HistoricStoreBase.historic');
 
   @override
-  ObservableMap<String, ObservableList<String>> get historic {
+  ObservableMap<String, ObservableMap<String, double>> get historic {
     _$historicAtom.reportRead();
     return super.historic;
   }
 
   @override
-  set historic(ObservableMap<String, ObservableList<String>> value) {
+  set historic(ObservableMap<String, ObservableMap<String, double>> value) {
     _$historicAtom.reportWrite(value, super.historic, () {
       super.historic = value;
     });
@@ -28,7 +28,7 @@ mixin _$HistoricStore on HistoricStoreBase, Store {
       ActionController(name: 'HistoricStoreBase');
 
   @override
-  void set(Map<String, ObservableList<String>> data) {
+  void set(Map<String, ObservableMap<String, double>> data) {
     final _$actionInfo = _$HistoricStoreBaseActionController.startAction(
         name: 'HistoricStoreBase.set');
     try {
@@ -39,11 +39,11 @@ mixin _$HistoricStore on HistoricStoreBase, Store {
   }
 
   @override
-  void add(String bookID, String id) {
+  void add(String bookID, String id, double position) {
     final _$actionInfo = _$HistoricStoreBaseActionController.startAction(
         name: 'HistoricStoreBase.add');
     try {
-      return super.add(bookID, id);
+      return super.add(bookID, id, position);
     } finally {
       _$HistoricStoreBaseActionController.endAction(_$actionInfo);
     }

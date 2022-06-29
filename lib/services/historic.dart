@@ -38,14 +38,14 @@ class Historic {
       final DataSnapshot snapshot = await ref!.get();
       if (!snapshot.exists) return;
 
-      final Map<String, ObservableList<String>> historic = {};
+      final Map<String, ObservableMap<String, double>> historic = {};
 
       for (DataSnapshot element in snapshot.children) {
         final Iterable<DataSnapshot> items = element.children;
-        final ObservableList<String> chapters = ObservableList();
+        final ObservableMap<String, double> chapters = ObservableMap();
 
         for (DataSnapshot item in items) {
-          chapters.add(item.key!);
+          chapters[item.key!] = double.tryParse(item.value.toString()) ?? 0.0;
         }
 
         historic[element.key!] = chapters;
@@ -58,16 +58,13 @@ class Historic {
     }
   }
 
-  void toggleHistoric(String id) {
+  void toggleHistoric(String id, double position) {
     if (ref == null) return _snackError(context);
-
-    final bookHistoric = store.historic[bookID];
-    if (bookHistoric != null && bookHistoric.contains(id)) return;
 
     final DatabaseReference chapterRef = ref!.child(bookID).child(id);
 
-    store.add(bookID, id);
-    chapterRef.set(id);
+    store.add(bookID, id, position);
+    chapterRef.set(position);
   }
 
   static void _snackError(BuildContext context) {

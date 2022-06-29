@@ -20,7 +20,8 @@ class ReaderScreen extends StatefulWidget {
   State<ReaderScreen> createState() => _ReaderScreenState();
 }
 
-class _ReaderScreenState extends State<ReaderScreen> {
+class _ReaderScreenState extends State<ReaderScreen>
+    with WidgetsBindingObserver {
   final String _html = Uri.dataFromString(
     htmlTemplate,
     mimeType: 'text/html',
@@ -38,6 +39,19 @@ class _ReaderScreenState extends State<ReaderScreen> {
   bool _isLoading = true;
   bool _getNextCap = true;
 
+  String? _position;
+  double? _initPosition;
+
+  void _toggleHistoric(String? value) {
+    if (value == null || !value.contains(',,')) return;
+
+    final List<String> values = value.split(',,');
+    final int index = int.parse(values.first);
+    final double position = double.parse(values.last);
+
+    _historic.toggleHistoric(_chapters[index].id, position);
+  }
+
   Future<void> _getContent() async {
     final Chapter chapter = _chapters[_index];
 
@@ -46,6 +60,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
     await _js!.insertContent(content, _index, chapter.name);
 
+    _finished = _index == 0;
     if (_finished) await _js!.finishedChapters();
 
     _getNextCap = false;
@@ -55,22 +70,24 @@ class _ReaderScreenState extends State<ReaderScreen> {
     if (!_isLoading) return;
     _isLoading = false;
 
+    if (_initPosition != null) await _js!.scrollTo(_initPosition!);
+
     await _js!.removeLoading();
   }
 
   void _onNext(JavascriptMessage message) {
     if (_finished || _getNextCap) return;
+    _toggleHistoric(_position);
 
     _index = _index - 1;
-    _finished = _index == 0;
-
     _getContent();
   }
 
-  void _onRead(JavascriptMessage message) {
-    final int index = int.parse(message.message);
-    _historic.toggleHistoric(_chapters[index].id);
+  void _onFinished(JavascriptMessage message) {
+    _toggleHistoric(message.message);
   }
+
+  void _onPosition(JavascriptMessage message) => _position = message.message;
 
   @override
   void didChangeDependencies() {
@@ -81,8 +98,33 @@ class _ReaderScreenState extends State<ReaderScreen> {
     _index = args.index;
     _chapters = args.chapters;
     _historic = Historic(bookID: _book.id, context: context, store: store);
+    _initPosition = args.position;
 
     super.didChangeDependencies();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        break;
+      case AppLifecycleState.inactive:
+        _toggleHistoric(_position);
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.detached:
+        _toggleHistoric(_position);
+        break;
+    }
+
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void dispose() {
+    _toggleHistoric(_position);
+    super.dispose();
   }
 
   @override
@@ -100,7 +142,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
         javascriptChannels: {
           JavascriptChannel(name: 'onLoad', onMessageReceived: _onLoad),
           JavascriptChannel(name: 'onNext', onMessageReceived: _onNext),
-          JavascriptChannel(name: 'onRead', onMessageReceived: _onRead),
+          JavascriptChannel(name: 'onFinished', onMessageReceived: _onFinished),
+          JavascriptChannel(name: 'onPosition', onMessageReceived: _onPosition),
         },
       ),
     );
@@ -111,10 +154,12 @@ class ReaderArguments {
   final int index;
   final BookItem book;
   final List<Chapter> chapters;
+  final double? position;
 
   const ReaderArguments({
     required this.index,
     required this.book,
     required this.chapters,
+    this.position,
   });
 }

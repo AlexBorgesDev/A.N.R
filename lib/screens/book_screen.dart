@@ -337,7 +337,7 @@ class _BookScreenState extends State<BookScreen> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 32),
                   trailing: Observer(builder: ((context) {
                     final book = store.historic[_bookItem.id];
-                    final bool read = book?.contains(chapter.id) ?? false;
+                    final bool read = book?.containsKey(chapter.id) ?? false;
 
                     final List<Widget> children = [];
 
@@ -362,6 +362,7 @@ class _BookScreenState extends State<BookScreen> {
                         book: _bookItem,
                         chapters: _chapters,
                         index: index,
+                        position: store.historic[_bookItem.id]?[chapter.id],
                       ),
                     );
 

@@ -105,7 +105,7 @@ const String htmlTemplate = '''
 
         container.append(title);
 
-        let read = false;
+        let finished = false;
         let loaded = 0;
         let callNext = false;
         const sources = data.split(',,separator,,');
@@ -133,14 +133,18 @@ const String htmlTemplate = '''
           const minNext = (75 / 100) * height;
           const max = height * 1.25;
 
-          if (position >= minRead && !read) {
-            read = true;
-            onRead.postMessage(`\${id}`);
+          if (position >= height && !finished) {
+            finished = true;
+            onFinished.postMessage(`\${id},,\${height}`);
           }
 
           if (position >= minNext && !callNext) {
             callNext = true;
             onNext.postMessage('');
+          }
+
+          if (position <= height && position > 0) {
+            onPosition.postMessage(`\${id},,\${position}`);
           }
 
           if (position >= max) {
