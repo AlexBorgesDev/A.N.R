@@ -32,6 +32,34 @@ Nenhum dos livros encontrados estão armazenados em servidor próprio. Todos ele
   <img width="24.5%" src="./.github/Screenshot_20220617-104201.png" />
 </p>
 
+## Instalação
+
+Clone o projeto
+
+```bash
+git clone https://github.com/AlexBorgesDev/A.N.R.git
+```
+
+Vá para o diretório do projeto
+
+```bash
+cd A.N.R
+```
+
+Instale as dependências
+
+```bash
+flutter pub get
+```
+
+Este aplicativo utiliza o **Firebase**. Para configura-lo, é so seguir os passos da [documentação oficial](https://firebase.google.com/docs/flutter/setup?hl=pt-br&platform=android).
+
+Apos configurar o firebase, é so rodar o app com o comando
+
+```bash
+flutter run --multidex
+```
+
 ## Licença
 
 [MIT](./LICENSE)
