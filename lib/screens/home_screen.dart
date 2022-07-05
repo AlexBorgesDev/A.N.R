@@ -6,6 +6,7 @@ import 'package:A.N.R/services/historic.dart';
 import 'package:A.N.R/services/scans/manga_host_services.dart';
 import 'package:A.N.R/services/scans/mark_services.dart';
 import 'package:A.N.R/services/scans/neox_services.dart';
+import 'package:A.N.R/services/scans/prisma_services.dart';
 import 'package:A.N.R/services/scans/random_services.dart';
 import 'package:A.N.R/utils/start_download.dart';
 import 'package:A.N.R/widgets/book_element_horizontal_list.dart';
@@ -26,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<BookItem> _neox = [];
   List<BookItem> _mark = [];
   List<BookItem> _random = [];
+  List<BookItem> _prisma = [];
   List<BookItem> _mangaHost = [];
 
   Future<void> _handleGetDatas() async {
@@ -33,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
       NeoxServices.lastAdded,
       MarkServices.lastAdded,
       RandomServices.lastAdded,
+      PrismaServices.lastAdded,
       MangaHostServices.lastAdded,
     ]);
 
@@ -40,7 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _neox = items[0];
       _mark = items[1];
       _random = items[2];
-      _mangaHost = items[3];
+      _prisma = items[3];
+      _mangaHost = items[4];
       _isLoading = false;
     });
   }
@@ -140,6 +144,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   final BookItem book = _mark[index];
                   return BookElementData(
                     tag: book.tag,
+                    imageURL: book.imageURL,
+                    imageURL2: book.imageURL2,
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        RoutesName.BOOK,
+                        arguments: book,
+                      );
+                    },
+                  );
+                },
+              ),
+              const SectionListTitle('Prisma Scans - Últimos adicionados'),
+              BookElementHorizontalList(
+                isLoading: _isLoading,
+                itemCount: _prisma.length,
+                itemData: (index) {
+                  final BookItem book = _prisma[index];
+                  return BookElementData(
+                    tag: book.tag,
+                    headers: book.headers,
                     imageURL: book.imageURL,
                     imageURL2: book.imageURL2,
                     onTap: () {

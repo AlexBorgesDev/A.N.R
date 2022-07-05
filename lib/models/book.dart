@@ -20,7 +20,8 @@ class Book {
 
     final String lastChapter = chapters.first.name;
     final String totalChapter = lastChapter
-        .replaceAll('Cap.', '')
+        .toLowerCase()
+        .replaceAll('cap.', '')
         .replaceAll(RegExp(r'[^0-9.]'), '')
         .replaceAll(RegExp(r','), '.')
         .split('.')
