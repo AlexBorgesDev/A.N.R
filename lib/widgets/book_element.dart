@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:A.N.R/styles/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -57,11 +55,10 @@ class BookElement extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: 0,
-                left: 0,
+                top: 6,
+                left: 6,
                 child: tag != null
                     ? Container(
-                        margin: const EdgeInsets.all(6),
                         padding: const EdgeInsets.symmetric(
                           vertical: 2.5,
                           horizontal: 6,
@@ -75,7 +72,6 @@ class BookElement extends StatelessWidget {
                           child: Text(
                             tag!,
                             style: const TextStyle(
-                              color: Colors.white,
                               fontSize: 12.5,
                               fontWeight: FontWeight.w600,
                             ),
@@ -84,15 +80,6 @@ class BookElement extends StatelessWidget {
                         ),
                       )
                     : const SizedBox(),
-              ),
-              Positioned.fill(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: is18 == true ? 4 : 0,
-                    sigmaY: is18 == true ? 4 : 0,
-                  ),
-                  child: Container(),
-                ),
               ),
               Positioned.fill(
                 child: Material(

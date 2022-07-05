@@ -3,6 +3,7 @@ import 'package:A.N.R/models/book_item.dart';
 import 'package:A.N.R/routes.dart';
 import 'package:A.N.R/services/favorites.dart';
 import 'package:A.N.R/services/historic.dart';
+import 'package:A.N.R/services/scans/cronos_services.dart';
 import 'package:A.N.R/services/scans/manga_host_services.dart';
 import 'package:A.N.R/services/scans/mark_services.dart';
 import 'package:A.N.R/services/scans/neox_services.dart';
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<BookItem> _neox = [];
   List<BookItem> _mark = [];
   List<BookItem> _random = [];
+  List<BookItem> _cronos = [];
   List<BookItem> _prisma = [];
   List<BookItem> _mangaHost = [];
 
@@ -35,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       NeoxServices.lastAdded,
       MarkServices.lastAdded,
       RandomServices.lastAdded,
+      CronosServices.lastAdded,
       PrismaServices.lastAdded,
       MangaHostServices.lastAdded,
     ]);
@@ -43,8 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
       _neox = items[0];
       _mark = items[1];
       _random = items[2];
-      _prisma = items[3];
-      _mangaHost = items[4];
+      _cronos = items[3];
+      _prisma = items[4];
+      _mangaHost = items[5];
       _isLoading = false;
     });
   }
@@ -144,6 +148,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   final BookItem book = _mark[index];
                   return BookElementData(
                     tag: book.tag,
+                    imageURL: book.imageURL,
+                    imageURL2: book.imageURL2,
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        RoutesName.BOOK,
+                        arguments: book,
+                      );
+                    },
+                  );
+                },
+              ),
+              const SectionListTitle('Cronos Scans - Últimos adicionados'),
+              BookElementHorizontalList(
+                isLoading: _isLoading,
+                itemCount: _cronos.length,
+                itemData: (index) {
+                  final BookItem book = _cronos[index];
+                  return BookElementData(
+                    tag: book.tag,
+                    headers: book.headers,
                     imageURL: book.imageURL,
                     imageURL2: book.imageURL2,
                     onTap: () {

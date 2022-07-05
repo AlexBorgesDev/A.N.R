@@ -7,18 +7,23 @@ import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
-class NeoxServices {
-  static String get baseURL => 'https://neoxscans.net';
+class CronosServices {
+  static String get baseURL => 'https://cronosscan.net';
 
   static final DioCacheManager _cacheManager = DioCacheManager(
     CacheConfig(baseUrl: baseURL),
   );
 
-  static Options _cacheOptions({String? subKey, bool? forceRefresh}) {
+  static Options _cacheOptions({
+    String? subKey,
+    bool? forceRefresh,
+    Options? options,
+  }) {
     return buildCacheOptions(
       const Duration(days: 15),
       subKey: subKey,
       forceRefresh: forceRefresh ?? true,
+      options: options,
     );
   }
 
@@ -31,7 +36,6 @@ class NeoxServices {
       dio.interceptors.add(_cacheManager.interceptor);
 
       final Response response = await dio.get(baseURL, options: options);
-
       final Document document = parse(response.data);
 
       final List<Element> elements =
@@ -45,7 +49,6 @@ class NeoxServices {
         final String url = (a.attributes['href'] ?? '').trim();
         final String name = a.text.trim();
         final String imageURL = (img.attributes['data-src'] ?? '').trim();
-        final String? tag = element.querySelector('span')?.text.trim();
 
         final String? srcset = img.attributes['data-srcset'];
         final String? imageURL2 = srcset == null
@@ -62,7 +65,6 @@ class NeoxServices {
           items.add(BookItem(
             id: toId(name),
             url: url,
-            tag: tag,
             name: name,
             imageURL: imageURL,
             imageURL2: imageURL2,
@@ -157,24 +159,49 @@ class NeoxServices {
 
     // Sinopse
     final String sinopse =
-        document.querySelector('.manga-excerpt')?.text.trim() ?? '';
+        document.querySelector('.summary__content')?.text.trim() ?? '';
+
+    final Element? idElement = document.querySelector('#manga-chapters-holder');
+    final String id = (idElement?.attributes['data-id'] ?? '').trim();
 
     // Chapters
-    elements = document.querySelectorAll('.main li > a');
-    for (Element element in elements) {
-      final url = (element.attributes['href'] ?? '').trim();
-      final name = element.text.trim();
+    try {
+      final String chapterURL = '$baseURL/wp-admin/admin-ajax.php';
+      options = _cacheOptions(
+        subKey: chapterURL,
+        options: Options(
+          contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
+          headers: {'origin': baseURL, 'referer': url},
+        ),
+      );
 
-      if (url.isNotEmpty && name.isNotEmpty) {
-        final String id = name
-            .toLowerCase()
-            .replaceAll('cap.', '')
-            .replaceAll(RegExp(r'[^0-9.]'), '')
-            .replaceAll('.', '_');
+      response = await dio.post(
+        chapterURL,
+        data: {
+          'action': 'manga_get_chapters',
+          'manga': id,
+        },
+        options: options,
+      );
 
-        chapters.add(Chapter(id: id, url: url, name: name));
+      document = parse(response.data);
+      elements = document.querySelectorAll('ul.main > li.wp-manga-chapter > a');
+
+      for (Element element in elements) {
+        final String url = (element.attributes['href'] ?? '').trim();
+        final String name = element.text.trim();
+
+        if (url.isNotEmpty && name.isNotEmpty) {
+          final String id = name
+              .toLowerCase()
+              .replaceAll('cap.', '')
+              .replaceAll(RegExp(r'[^0-9.]'), '')
+              .replaceAll('.', '_');
+
+          chapters.add(Chapter(id: id, url: url, name: name));
+        }
       }
-    }
+    } catch (_) {}
 
     return Book(
       name: name,

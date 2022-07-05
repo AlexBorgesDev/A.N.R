@@ -69,6 +69,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Text('Mark'),
                   ),
                   const PopupMenuItem(
+                    value: Providers.CRONOS,
+                    child: Text('Cronos'),
+                  ),
+                  const PopupMenuItem(
                     value: Providers.MANGA_HOST,
                     child: Text('Manga Host'),
                   ),

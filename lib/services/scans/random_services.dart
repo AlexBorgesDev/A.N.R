@@ -89,7 +89,7 @@ class RandomServices {
     final List<Element> elements =
         document.querySelectorAll('.c-tabs-item div.row');
 
-    for (var element in elements) {
+    for (Element element in elements) {
       final Element? a = element.querySelector('h3 a');
       final Element? img = element.querySelector('img');
       if (a == null || img == null) continue;
@@ -180,8 +180,7 @@ class RandomServices {
           chapters.add(Chapter(id: id, url: url, name: name));
         }
       }
-      // ignore: empty_catches
-    } catch (e) {}
+    } catch (_) {}
 
     return Book(
       name: name,
