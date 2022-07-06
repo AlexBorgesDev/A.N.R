@@ -128,7 +128,7 @@ class NeoxServices {
 
   static Future<Book> bookInfo(String url, String name) async {
     final Dio dio = Dio();
-    Options options = _cacheOptions(subKey: url, forceRefresh: false);
+    Options options = _cacheOptions(subKey: url);
     dio.interceptors.add(_cacheManager.interceptor);
 
     Response response = await dio.get(url, options: options);
