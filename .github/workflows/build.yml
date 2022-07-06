@@ -1,6 +1,11 @@
 name: Build APK
 
-on: workflow_call
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types: [requested]
+    branches:
+      - 'main'
 
 jobs:
   build:
