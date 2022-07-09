@@ -9,6 +9,7 @@ import 'package:A.N.R/services/scans/mark_services.dart';
 import 'package:A.N.R/services/scans/neox_services.dart';
 import 'package:A.N.R/services/scans/prisma_services.dart';
 import 'package:A.N.R/services/scans/random_services.dart';
+import 'package:A.N.R/services/scans/reaper_services.dart';
 import 'package:A.N.R/utils/start_download.dart';
 import 'package:A.N.R/widgets/book_element_horizontal_list.dart';
 import 'package:A.N.R/widgets/section_list_title.dart';
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<BookItem> _random = [];
   List<BookItem> _cronos = [];
   List<BookItem> _prisma = [];
+  List<BookItem> _reaper = [];
   List<BookItem> _mangaHost = [];
 
   Future<void> _handleGetDatas() async {
@@ -39,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       RandomServices.lastAdded,
       CronosServices.lastAdded,
       PrismaServices.lastAdded,
+      ReaperServices.lastAdded,
       MangaHostServices.lastAdded,
     ]);
 
@@ -48,7 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _random = items[2];
       _cronos = items[3];
       _prisma = items[4];
-      _mangaHost = items[5];
+      _reaper = items[5];
+      _mangaHost = items[6];
       _isLoading = false;
     });
   }
@@ -185,6 +189,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: _prisma.length,
                 itemData: (index) {
                   final BookItem book = _prisma[index];
+                  return BookElementData(
+                    tag: book.tag,
+                    headers: book.headers,
+                    imageURL: book.imageURL,
+                    imageURL2: book.imageURL2,
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        RoutesName.BOOK,
+                        arguments: book,
+                      );
+                    },
+                  );
+                },
+              ),
+              const SectionListTitle('Reaper Scans - Últimos adicionados'),
+              BookElementHorizontalList(
+                isLoading: _isLoading,
+                itemCount: _reaper.length,
+                itemData: (index) {
+                  final BookItem book = _reaper[index];
                   return BookElementData(
                     tag: book.tag,
                     headers: book.headers,

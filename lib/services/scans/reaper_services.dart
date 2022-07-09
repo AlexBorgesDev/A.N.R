@@ -7,8 +7,8 @@ import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
-class PrismaServices {
-  static String get baseURL => 'https://prismascans.net';
+class ReaperServices {
+  static String get baseURL => 'https://reaperscans.com.br';
 
   static final DioCacheManager _cacheManager = DioCacheManager(
     CacheConfig(baseUrl: baseURL),
@@ -34,41 +34,32 @@ class PrismaServices {
       final Document document = parse(response.data);
 
       final List<Element> elements =
-          document.querySelectorAll('#loop-content .page-item-detail');
+          document.querySelectorAll('div.col-6.col-sm-6.col-md-6.col-xl-3');
 
       for (Element element in elements) {
-        final Element? a = element.querySelector('h3 a');
+        final Element? a = element.querySelector('a');
+        final Element? h5 = element.querySelector('h5');
         final Element? img = element.querySelector('img');
-        if (a == null || img == null) continue;
+        if (a == null || h5 == null || img == null) continue;
 
         final String url = (a.attributes['href'] ?? '').trim();
-        final String name = a.text.trim();
-        final String imageURL = (img.attributes['src'] ?? '').trim();
-
-        final String? srcset = img.attributes['srcset'];
-        final String? imageURL2 = srcset == null
-            ? null
-            : '$srcset,'
-                .replaceAll(RegExp(r'([1-9])\w+,'), '')
-                .trim()
-                .split(' ')
-                .where((value) => value.length > 3)
-                .last
-                .trim();
+        final String name = h5.text.trim();
+        final String imageURL = (img.attributes['data-src'] ?? '').trim();
+        final String? tag = element.querySelector('a span')?.text.trim();
 
         if (url.isNotEmpty && name.isNotEmpty && imageURL.isNotEmpty) {
           items.add(BookItem(
             id: toId(name),
             url: url,
+            tag: tag,
             name: name,
             imageURL: imageURL,
-            imageURL2: imageURL2,
           ));
         }
       }
 
       return items;
-    } catch (e) {
+    } catch (_) {
       return [];
     }
   }
@@ -125,7 +116,7 @@ class PrismaServices {
 
   static Future<Book> bookInfo(String url, String name) async {
     final Dio dio = Dio();
-    Options options = _cacheOptions(subKey: url, forceRefresh: false);
+    Options options = _cacheOptions(subKey: url);
     dio.interceptors.add(_cacheManager.interceptor);
 
     Response response = await dio.get(url, options: options);
@@ -145,7 +136,7 @@ class PrismaServices {
     String? type;
     elements = document.querySelectorAll('.post-content_item');
     elements.removeWhere((element) {
-      return element.querySelector('h5')?.text.trim().toLowerCase() != 'tipo';
+      return element.querySelector('h5')?.text.trim().toLowerCase() != 'type';
     });
 
     if (elements.isNotEmpty) {
@@ -157,29 +148,23 @@ class PrismaServices {
         document.querySelector('.summary__content')?.text.trim() ?? '';
 
     // Chapters
-    try {
-      final String chapterURL = '$url/ajax/chapters'.replaceAll('//a', '/a');
-      options = _cacheOptions(subKey: chapterURL);
+    elements = document.querySelectorAll('.main li a');
+    for (Element element in elements) {
+      element.querySelector('span')?.remove();
 
-      response = await dio.post(chapterURL, options: options);
-      document = parse(response.data);
+      final String url = (element.attributes['href'] ?? '').trim();
+      final String name = element.text.trim();
 
-      elements = document.querySelectorAll('ul.main > li.wp-manga-chapter > a');
-      for (Element element in elements) {
-        final String url = (element.attributes['href'] ?? '').trim();
-        final String name = element.text.trim();
+      if (url.isNotEmpty && name.isNotEmpty) {
+        final String id = name
+            .toLowerCase()
+            .replaceAll('cap.', '')
+            .replaceAll(RegExp(r'[^0-9.]'), '')
+            .replaceAll('.', '_');
 
-        if (url.isNotEmpty && name.isNotEmpty) {
-          final String id = name
-              .toLowerCase()
-              .replaceAll('cap.', '')
-              .replaceAll(RegExp(r'[^0-9.]'), '')
-              .replaceAll('.', '_');
-
-          chapters.add(Chapter(id: id, url: url, name: name));
-        }
+        chapters.add(Chapter(id: id, url: url, name: name));
       }
-    } catch (_) {}
+    }
 
     return Book(
       name: name,
@@ -204,7 +189,7 @@ class PrismaServices {
         document.querySelectorAll('.reading-content img');
 
     for (Element element in elements) {
-      final String url = (element.attributes['src'] ?? '').trim();
+      final String url = (element.attributes['data-src'] ?? '').trim();
       if (url.isNotEmpty) content.add(url);
     }
 

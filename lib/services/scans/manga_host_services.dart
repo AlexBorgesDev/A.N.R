@@ -117,6 +117,8 @@ class MangaHostServices {
 
   static Map<String, String> get headers {
     return {
+      'Origin': 'https://mangahost4.com',
+      'Referer': 'https://mangahost4.com/',
       'accept':
           'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
       'upgrade-insecure-requests': '1',

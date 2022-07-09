@@ -1,5 +1,5 @@
 // ignore: constant_identifier_names
-enum Providers { NEOX, RANDOM, MARK, CRONOS, MANGA_HOST }
+enum Providers { NEOX, RANDOM, MARK, CRONOS, PRISMA, REAPER, MANGA_HOST }
 
 extension ProvidersExtension on Providers {
   String get value {
@@ -15,6 +15,12 @@ extension ProvidersExtension on Providers {
 
       case Providers.CRONOS:
         return 'Cronos';
+
+      case Providers.PRISMA:
+        return 'Prisma';
+
+      case Providers.REAPER:
+        return 'Reaper';
 
       case Providers.MANGA_HOST:
         return 'Manga Host';
