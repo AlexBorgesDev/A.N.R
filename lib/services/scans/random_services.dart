@@ -44,9 +44,9 @@ class RandomServices {
 
         final String url = (a.attributes['href'] ?? '').trim();
         final String name = a.text.trim();
-        final String imageURL = (img.attributes['src'] ?? '').trim();
+        final String imageURL = (img.attributes['data-src'] ?? '').trim();
 
-        final String? srcset = img.attributes['srcset'];
+        final String? srcset = img.attributes['data-srcset'];
         final List<String>? sources = srcset == null
             ? null
             : '$srcset,'
@@ -154,7 +154,7 @@ class RandomServices {
 
     // Sinopse
     final String sinopse =
-        document.querySelector('.summary__content')?.text.trim() ?? '';
+        document.querySelector('.manga-excerpt')?.text.trim() ?? '';
 
     // Chapters
     try {
